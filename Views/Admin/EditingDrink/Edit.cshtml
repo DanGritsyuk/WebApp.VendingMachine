@@ -1,0 +1,64 @@
+﻿@model WebApp.VendingMachine.Drink
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Редактирование</title>
+</head>
+<body>
+    @{
+        <h4>Title</h4>
+        <hr />
+        <div class="row">
+            <div class="col-md-4">
+                @using (Html.BeginForm("EditDrink", "Admin", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                {
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="ItemId" />
+                    <div class="form-group">
+                        <label asp-for="Title" class="control-label">Название</label>
+                        <input asp-for="Title" class="form-control" />
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Price" class="control-label">Цена</label>
+                        <input asp-for="Price" class="form-control" />
+                        <span asp-validation-for="Price" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="CountInVM" class="control-label">Количество</label>
+                        <input asp-for="CountInVM" class="form-control" />
+                        <span asp-validation-for="CountInVM" class="text-danger"></span>
+                    </div>
+                    <div class="form-group form-check">
+                        <label class="form-check-label">
+                            <input class="form-check-input" asp-for="IsAvailable" /> В продаже
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <img style=" width:75px;height:auto" src="@Url.Content(Model.ImageUrl)" alt="@Url.Content(Model.ImageUrl)" />
+                    </div>
+                    <div class="form-group">
+                        <input type="file" name="Image" id="Image" accept=".jpg,.jpeg,.png,.gif" />
+                        <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="submit" value="Сохранить" class="btn btn-primary" />
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div>
+            <a asp-action="Index">Отмена</a>
+        </div>
+    }
+</body>
+</html>

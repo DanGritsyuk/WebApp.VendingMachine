@@ -1,0 +1,28 @@
+﻿@model WebApp.VendingMachine.Drink
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Удаление</title>
+</head>
+<body>
+
+<h3>Вы уверены что хотите удалить этот товар?</h3>
+<div>
+    <h4>@Html.DisplayFor(model => model.Title)</h4>
+    <hr />
+    @using (Html.BeginForm("DeleteDrinkConfirmedAsyng", "Admin", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+            <input type="hidden" asp-for="ItemId" />
+            <input type="submit" value="Удалить" class="btn btn-danger" />
+            <a asp-action="Index">Отмена</a>
+    }
+    </div>
+</body>
+</html>

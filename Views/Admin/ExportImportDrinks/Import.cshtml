@@ -1,0 +1,109 @@
+﻿@using WebApp.VendingMachine
+@model ImportDrinksViewModel
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Импорт</title>
+</head>
+<body>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    <h2>
+                        Импорт товаров
+                    </h2>
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+
+        @if (Model == null)
+        {
+            <tbody>
+                <tr>
+                    <td>
+                        <div class="col-md-4">
+                            @using (Html.BeginForm("ToImport", "Admin", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                            {
+                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                <input type="file" name="importFile" id="importFile" accept=".vm" />
+                                <div class="form-group">
+                                    <input type="submit" value="Загрузить" class="btn btn-primary" />
+                                </div>
+                            }
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        }
+        else
+        {
+            <tbody>
+                <tr>
+                    <td>
+                        @using (Html.BeginForm("ConfirmedImport", "Admin", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                        {
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                            <input id="sessionId" name="sessionId" type="hidden" value="@Model.SessionId" />
+                                            <div class="form-group">
+                                                <input type="submit" value="Импортировать" class="btn btn-primary" />
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <h3>Наименование | </h3>
+                                        </td>
+                                        <td>
+                                            <h3>Цена | </h3>
+                                        </td>
+                                        <td>
+                                            <h3>Количество | </h3>
+                                        </td>
+                                        <td>
+                                            <div class="form-group form-check">
+                                                <label class="form-check-label">
+                                                    <input type="checkbox" checked="checked" class="form-check-input" />
+                                                </label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    @foreach (var drink in Model.Drinks)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => drink.Title)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => drink.Price)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => drink.CountInVM)
+                                            </td>
+                                            <td>
+                                                <div class="form-group form-check">
+                                                    <label class="form-check-label">
+                                                        <input type="checkbox" id="drinksNames" name="drinksNames" value="@drink.Title" checked="checked" class="form-check-input" />
+                                                    </label>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                    </td>
+                </tr>
+            </tbody>
+        }
+    </table>
+</body>
+</html>

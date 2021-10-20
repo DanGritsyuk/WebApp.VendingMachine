@@ -1,0 +1,103 @@
+﻿@using WebApp.VendingMachine
+@model List<Drink>
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Экспорт</title>
+</head>
+<body>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    <h2>
+                        Экспорт товаров
+                    </h2>
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+
+        @if (Model == null)
+        {
+            <tbody>
+                <tr>
+                    <td>
+                        нет напитков
+                    </td>
+                </tr>
+            </tbody>
+        }
+        else
+        {
+            <tbody>
+                <tr>
+                    <td>
+                        @using (Html.BeginForm("ToExport", "Admin", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                        {
+                            <table>
+                                <tr>
+                                    <td>
+                                        <div class="form-group">
+                                            <input type="submit" value="Экспортировать" class="btn btn-primary" />
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                    </td>
+                                    <td>
+                                        <h3>Наименование | </h3>
+                                    </td>
+                                    <td>
+                                        <h3>Цена | </h3>
+                                    </td>
+                                    <td>
+                                        <h3>Количество | </h3>
+                                    </td>
+                                    <td>
+                                        <div class="form-group form-check">
+                                            <label class="form-check-label">
+                                                <input type="checkbox" class="form-check-input" />
+                                            </label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @foreach (var viewModel in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="form-group">
+                                                <img style=" width:15px;height:auto" src="@Url.Content(viewModel.ImageUrl)" alt="@Url.Content(viewModel.ImageUrl)" />
+                                            </div>
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => viewModel.Title)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => viewModel.Price)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => viewModel.CountInVM)
+                                        </td>
+                                        <td>
+                                            <div class="form-group form-check">
+                                                <label class="form-check-label">
+                                                    <input type="checkbox" id="ItemIds" name="ItemIds" value="@viewModel.ItemId" class="form-check-input" />
+                                                </label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </table>
+                        }
+                    </td>
+                </tr>
+            </tbody>
+        }
+    </table>
+</body>
+</html>

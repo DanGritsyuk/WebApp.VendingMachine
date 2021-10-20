@@ -1,0 +1,134 @@
+﻿@using WebApp.VendingMachine
+@model VendingMachineViewModel
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Administration</title>
+</head>
+<body>
+
+    @* Model Vending Machine *@
+
+    @{
+        if (Model != null)
+        {
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            <h2>
+                                @Html.DisplayFor(modelItem => Model.Name)
+                            </h2>
+                        </th>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <td>
+                            Сумма в автомате:
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => Model.Balance)
+                        </td>
+                        <td>
+                            @using (Html.BeginForm("EditCoins", "Admin", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                            {
+                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                <div class="form-group">
+                                    <input type="submit" value="Монеты" class="btn btn-primary" />
+                                </div>
+                            }
+                        </td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <p>
+                                <a asp-action="Create" asp-controller="Admin">Добавить новый напиток</a>
+                            </p>
+                        </td>
+                    </tr>
+
+                    @* Drinks *@
+
+                    @if (Model.Drinks == null)
+                    {
+                        <tr>
+                            <td>
+                                нет напитков
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        <tr>
+                            <td>
+                                <h3>Наименование</h3>
+                            </td>
+                            <td>
+                                <h3>Цена</h3>
+                            </td>
+                            <td>
+                                <h3>Количество</h3>
+                            </td>
+                            <td>
+                                <a asp-action="ExportList" asp-controller="Admin" >Експорт</a> |
+                                <a asp-action="ImportList" asp-controller="Admin" >Импорт</a>
+                            </td>
+                        </tr>
+                        @foreach (var drink in Model.Drinks)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => drink.Title)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => drink.Price)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => drink.CountInVM)
+                                </td>
+                                <td>
+                                    <a asp-action="Edit" asp-controller="Admin" asp-route-id="@drink.ItemId">Редактировать</a> |
+                                    <a asp-action="Details" asp-controller="Admin" asp-route-id="@drink.ItemId">Обзор</a> |
+                                    <a asp-action="Delete" asp-controller="Admin" asp-route-id="@drink.ItemId">Удалить</a>
+                                </td>
+                            </tr>
+                        }
+
+                    }
+                </tbody>
+            </table>
+
+        }
+        else
+        {
+            <h4>Установка торгового автомата</h4>
+            <hr />
+            <div class="row">
+                <div class="col-md-4">
+                    @using (Html.BeginForm("Create", "Admin", FormMethod.Post))
+                    {
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div class="form-group">
+                            <label class="control-label"></label>
+                            <input id="txtName" name="Name" class="form-control" />
+                            <span class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <input type="submit" value="Create" class="btn btn-primary" />
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    }   
+</body>
+</html>

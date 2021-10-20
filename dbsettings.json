@@ -1,0 +1,7 @@
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=DAN-NB;Database=WebApp.VendingMachine;Trusted_Connection=True;MultipleActiveResultSets=true"
+  }
+}
+
+// (localdb)\\MSSQLLocalDB

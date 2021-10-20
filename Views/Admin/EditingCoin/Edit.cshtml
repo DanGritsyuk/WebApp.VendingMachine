@@ -1,0 +1,57 @@
+﻿@using WebApp.VendingMachine
+@model List<Coin>
+
+<h4>Coin</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        @using (Html.BeginForm("EditingCoins", "Admin", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            <table class="table">
+                @if (Model != null)
+                {
+                    <tr>
+                        <td>
+                            <h3>Номинал</h3>
+                        </td>
+                        <td>
+                            <h3>Количество</h3>
+                        </td>
+                        <td>
+                            <h3>Прием для платежа</h3>
+                        </td>
+                        <td></td>
+                    </tr>
+                    @for (int i = 0; i < Model.Count; i++)
+                    {
+                        <tr>
+                            <td>
+                                @Html.HiddenFor(m => m[i].ItemId, new { @class = "form-control" })
+                                @Html.HiddenFor(m => m[i].Denomination, new { @class = "form-control" })
+                                @Html.DisplayFor(m => m[i].Denomination)
+                            </td>
+                            <td>                                
+                                @Html.TextBoxFor(m => m[i].CountInVM, new { @class = "form-control" })
+                            </td>
+                            <td>
+                                @Html.CheckBoxFor(m => m[i].IsAvailable, new { @class = "form-control" })
+                            </td>
+                        </tr>
+                    }
+                    <tr>
+                        <td>
+                            <div class="form-group">
+                                <input type="submit" value="Сохранить" class="btn btn-primary" />
+                            </div>
+                        </td>
+                    </tr>
+                }
+
+            </table>
+        }
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Вернуться на главную</a>
+</div>

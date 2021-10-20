@@ -1,0 +1,26 @@
+﻿@using WebApp.VendingMachine
+@model VendingMachineViewModel
+
+@{
+    Layout = null;
+}
+
+<!DOCUME html>
+
+    <html>
+
+    <head>
+        <meta name="viewport" content="width-device-width" />
+        <title>Vending Machine</title>
+    </head>
+
+    <body>
+        @{
+            if (Model == null)
+            { <h1>Торговый автомат не работает</h1> }
+            else
+            { <h1>Тут скоро появится торговый автомат</h1> }
+        }
+    </body>
+
+</html>

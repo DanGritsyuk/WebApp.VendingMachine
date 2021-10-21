@@ -19,10 +19,18 @@ namespace WebApp.VendingMachine
         public List<Drink> Drinks { get; set; }
         public List<Coin> Coins { get; set; }
 
+        [Required]
+        public bool IsAvailable { get; set; }
+
         [NotMapped]
         public decimal Balance =>
-            Coins.Where(cn => cn.vendingMachine.ItemId == ItemId).Sum(cn => cn.Denomination * cn.CountInVM);
+            Coins != null ? Coins.Where(cn => cn.vendingMachine.ItemId == ItemId).Sum(cn => cn.Denomination * cn.CountInVM) : 0;
 
+        public static Guid? GetThisMachineGuid()
+        {
+            try { return Guid.Parse(System.IO.File.ReadAllText("App_Data/Config/ThisMachineGuid.config")); }
+            catch { return null; }
+        }
 
         public static VendingMachineViewModel GetDataFromBase(VendingMachineContext context, Guid thisMachineGuid)
         {
@@ -42,5 +50,8 @@ namespace WebApp.VendingMachine
                 throw ex;
             }
         }
+
+        public static bool VendingMachineViewModelExists(Guid id, VendingMachineContext context) =>
+            context.VendingMachineViewModel.Any(e => e.ItemId == id);
     }
 }

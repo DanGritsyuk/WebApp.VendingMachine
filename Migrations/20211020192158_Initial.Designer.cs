@@ -10,7 +10,7 @@ using WebApp.VendingMachine;
 namespace WebApp.VendingMachine.Migrations
 {
     [DbContext(typeof(VendingMachineContext))]
-    [Migration("20211018174038_Initial")]
+    [Migration("20211020192158_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -65,7 +65,7 @@ namespace WebApp.VendingMachine.Migrations
                         .HasColumnType("bit");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,4)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -87,6 +87,9 @@ namespace WebApp.VendingMachine.Migrations
                     b.Property<Guid>("ItemId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsAvailable")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()

@@ -51,13 +51,38 @@ namespace WebApp.VendingMachine
             return objectOut;
         }
 
+        public static string SerializeObjectToXmlText<T>(T serializableObject)
+        {
+            if (serializableObject == null) { throw new ArgumentException(); }
+
+            DataContractSerializer ser;
+            try
+            {
+                ser = new DataContractSerializer(typeof(T));
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            using (var sw = new Utf8StringWriter())
+            {
+                using (XmlWriter xw = XmlWriter.Create(sw))
+                {
+                    ser.WriteObject(xw, serializableObject);
+                }
+                return sw.ToString();
+            }
+
+        }
+
         public static T DeSerializeObjectFromXmlText<T>(string fileText)
         {
             if (string.IsNullOrWhiteSpace(fileText)) { return default(T); }
 
             T objectOut = default(T);
 
-            using (MemoryStream stream = new MemoryStream(Encoding.ASCII.GetBytes(fileText)))
+            using (MemoryStream stream = new MemoryStream(Encoding.UTF8.GetBytes(fileText)))
             {
                 DataContractSerializer dcs = new DataContractSerializer(typeof(T));
 
@@ -68,6 +93,11 @@ namespace WebApp.VendingMachine
             }
 
             return objectOut;
+        }
+
+        private class Utf8StringWriter : StringWriter
+        {
+            public override Encoding Encoding => Encoding.UTF8;
         }
     }
 }

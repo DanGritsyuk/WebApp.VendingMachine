@@ -18,7 +18,7 @@ namespace WebApp.VendingMachine
         public AdminController(VendingMachineContext context, IWebHostEnvironment appEnvironment)
         {
             _context = context;
-            _thisMachineGuid = new Lazy<Guid?>(HomeController.GetThisMachineGuid);
+            _thisMachineGuid = new Lazy<Guid?>(VendingMachineViewModel.GetThisMachineGuid);
             _appEnvironment = appEnvironment;
         }
 
@@ -41,10 +41,12 @@ namespace WebApp.VendingMachine
             if (ModelState.IsValid && !string.IsNullOrEmpty(name))
             {
                 var vendingMachineViewModel = new VendingMachineViewModel();
+
                 vendingMachineViewModel.ItemId = Guid.NewGuid();
                 vendingMachineViewModel.Name = name;
+                vendingMachineViewModel.IsAvailable = true;
 
-                using (StreamWriter sw = new StreamWriter("Config/ThisMachineGuid.config", false, System.Text.Encoding.Default))
+                using (StreamWriter sw = new StreamWriter("App_Data/Config/ThisMachineGuid.config", false, System.Text.Encoding.Default))
                 {
                     sw.WriteLine(vendingMachineViewModel.ItemId);
                 }
@@ -104,7 +106,8 @@ namespace WebApp.VendingMachine
         {
             if (ModelState.IsValid &&
                 !string.IsNullOrEmpty(title) &&
-                image != null)
+                image != null &&
+                !_context.Drinks.Any(dr => dr.Title == title))
             {
                 var path = LoadImageAsync(title, image);
 
@@ -243,6 +246,8 @@ namespace WebApp.VendingMachine
 
             foreach (var importDrink in importDrinks)
             {
+                if (!drinksNames.Any(dr => dr == importDrink.Title)) { continue; }
+
                 Drink drinkForUpdate = _context.Drinks.Where(dr => dr.Title == importDrink.Title).FirstOrDefault();
                 importDrink.vendingMachine = GetThisVendingMachine();
                 string imagePath = string.Concat(_appEnvironment.ContentRootPath, "/wwwroot", importDrink.ImageUrl);
@@ -351,7 +356,7 @@ namespace WebApp.VendingMachine
 
             foreach (var importDrink in vmImportDrinks.Drinks)
             {
-                importDrink.IsAvailable = _context.Drinks.Where(dr => dr.Title == importDrink.Title) != null;
+                importDrink.IsAvailable = _context.Drinks.Where(dr => dr.Title == importDrink.Title).Count() > 0;
             }
 
             CashImportData(sessionId, drDataFile, importImagesDirectory, vmImportDrinks.Drinks);
@@ -421,10 +426,5 @@ namespace WebApp.VendingMachine
 
         private VendingMachineViewModel GetThisVendingMachine() =>
             VendingMachineViewModel.GetDataFromBase(_context, _thisMachineGuid.Value.Value);
-
-        private bool VendingMachineViewModelExists(Guid id)
-        {
-            return _context.VendingMachineViewModel.Any(e => e.ItemId == id);
-        }
     }
 }

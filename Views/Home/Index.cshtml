@@ -1,9 +1,5 @@
 ﻿@using WebApp.VendingMachine
-@model VendingMachineViewModel
-
-@{
-    Layout = null;
-}
+@model ShopcartViewModel
 
 <!DOCUME html>
 
@@ -13,14 +9,67 @@
         <meta name="viewport" content="width-device-width" />
         <title>Vending Machine</title>
     </head>
-
     <body>
-        @{
-            if (Model == null)
-            { <h1>Торговый автомат не работает</h1> }
-            else
-            { <h1>Тут скоро появится торговый автомат</h1> }
+        @if (Model != null || Model.ThisVM.IsAvailable)
+        {
+
+            <div id="main-content">
+                <div id="container">
+                    @foreach (var coin in Model.ThisVM.Coins)
+                    {
+
+
+                        <div class="coin-item">
+                            <p>монета @coin.Denomination</p>
+                            @if (coin.IsAvailable == true)
+                            {
+                                @Html.ActionLink("Пополнить баланс", "AddCoin", new
+                                {
+                                    CoinDenom = coin.Denomination,
+                                    SessionId = Model.SessionId != null ? Model.SessionId : "New",
+                                    ShopcartId = Model.ShopcartId != Guid.Empty ? Model.ShopcartId : Guid.NewGuid()
+                                })
+                            }
+                            else
+                            {
+                                <p>Монета заблокирована</p>
+                            }
+                        </div>
+                    }
+                </div>
+                @if (Model != null)
+                {
+                    <div class="balance-area">
+                        <p class="balance">Баланс автомата @Model.ClientMoney</p>
+                        <br />
+                        <a href="/Home/TakeTips"><input type="button" value="Забрать сдачу"></a>
+                    </div>
+                    <div class="items-area">
+                        @foreach (var drink in Model.ThisVM.Drinks)
+                        {
+
+                            @if (drink.IsAvailable)
+                            {
+                                <div class="drink-item">
+                                    <img style="width:150px;height:auto" src="@drink.ImageUrl" class="drink-image">
+                                    <p><h4>@drink.Title</h4></p>
+                                    <p>Цена: @drink.Price</p>
+                                    <p>Количество: @drink.CountInVM</p>
+                                    @if (drink.CountInVM > 0 && (Model.ClientMoney - Model.OrderSum) >= drink.Price)
+                                    {
+                                        @Html.ActionLink("Выбрать", "OrderDrink", new { drink.ItemId })
+                                    }
+                                </div>
+                            }
+                        }
+                    </div>
+                }
+            </div>
+
+        }
+        else
+        {
+            <h1>Торговый автомат не работает</h1>
         }
     </body>
-
 </html>

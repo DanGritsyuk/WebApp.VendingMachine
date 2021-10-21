@@ -80,7 +80,7 @@
                                     {
                                         <tr>
                                             <td>
-                                                @Html.DisplayFor(modelItem => drink.Title)
+                                                @Html.Label(null, drink.Title, drink.IsAvailable ? new { @style="color:red" } : null)
                                             </td>
                                             <td>
                                                 @Html.DisplayFor(modelItem => drink.Price)

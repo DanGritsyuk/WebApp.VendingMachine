@@ -1,7 +1,9 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
+using System.Threading.Tasks;
 
 namespace WebApp.VendingMachine
 {
@@ -66,5 +68,7 @@ namespace WebApp.VendingMachine
         /// навигационное свойство
         /// </summary>
         public VendingMachineViewModel vendingMachine { get; set; }
+
+        public static async Task<Drink> GetDrinkObjectAsync(int id, VendingMachineContext context) => await context.Drinks.FirstOrDefaultAsync(dr => dr.ItemId == id);
     }
 }

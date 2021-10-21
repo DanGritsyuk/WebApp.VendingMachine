@@ -5,7 +5,6 @@ using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting;
 using System.Collections.Generic;
@@ -78,7 +77,7 @@ namespace WebApp.VendingMachine
                 return NotFound();
             }
 
-            var drink = await GetDrinkObjectAsync(id.Value);
+            var drink = await Drink.GetDrinkObjectAsync(id.Value, _context);
 
             if (drink == null) { return NotFound(); }
             else { return View("EditingDrink/Details", drink); }
@@ -92,7 +91,7 @@ namespace WebApp.VendingMachine
                 return NotFound();
             }
 
-            var drink = await GetDrinkObjectAsync(id.Value);
+            var drink = await Drink.GetDrinkObjectAsync(id.Value, _context);
 
             if (drink == null) { return NotFound(); }
             else { return View("EditingDrink/Edit", drink); }
@@ -126,7 +125,7 @@ namespace WebApp.VendingMachine
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditDrink(int itemId, string title, decimal price, int countInVM, bool isAvailable, IFormFile image)
         {
-            Drink drink = await GetDrinkObjectAsync(itemId);
+            Drink drink = await Drink.GetDrinkObjectAsync(itemId, _context);
 
             if (ModelState.IsValid)
             {
@@ -163,7 +162,7 @@ namespace WebApp.VendingMachine
                 return NotFound();
             }
 
-            var drink = await GetDrinkObjectAsync(id.Value);
+            var drink = await Drink.GetDrinkObjectAsync(id.Value, _context);
 
             if (drink == null) { return NotFound(); }
             else { return View("EditingDrink/Delete", drink); }
@@ -174,7 +173,7 @@ namespace WebApp.VendingMachine
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteDrinkConfirmedAsyng(int itemId)
         {
-            var drink = await GetDrinkObjectAsync(itemId);
+            var drink = await Drink.GetDrinkObjectAsync(itemId, _context);
             DeleteImage(drink.ImageUrl);
             _context.Drinks.Remove(drink);
             await _context.SaveChangesAsync();
@@ -306,7 +305,7 @@ namespace WebApp.VendingMachine
 
             foreach (var id in ItemIds)
             {
-                Drink drinkToExport = GetDrinkObjectAsync(id).Result;
+                Drink drinkToExport = Drink.GetDrinkObjectAsync(id, _context).Result;
                 drinksToExport.Add(drinkToExport);
 
                 string fullImagePath = _appEnvironment.ContentRootPath + @"\wwwroot" + drinkToExport.ImageUrl;
@@ -404,7 +403,7 @@ namespace WebApp.VendingMachine
 
         #endregion
 
-        private async Task<Drink> GetDrinkObjectAsync(int id) => await _context.Drinks.FirstOrDefaultAsync(dr => dr.ItemId == id);
+        
 
         private async Task<string> LoadImageAsync(string title, IFormFile image)
         {

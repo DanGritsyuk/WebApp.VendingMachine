@@ -40,7 +40,7 @@
                 @if (Model != null)
                 {
                     <div class="balance-area">
-                        <p class="balance">Баланс автомата @Model.ClientMoney</p>
+                        <p class="balance">Внесено: @Model.ClientMoney</p>
                         <br />
                         <a href="/Home/TakeTips"><input type="button" value="Забрать сдачу"></a>
                     </div>
@@ -57,7 +57,7 @@
                                     <p>Количество: @drink.CountInVM</p>
                                     @if (drink.CountInVM > 0 && (Model.ClientMoney - Model.OrderSum) >= drink.Price)
                                     {
-                                        @Html.ActionLink("Выбрать", "OrderDrink", new { drink.ItemId })
+                                        @Html.ActionLink("Выбрать", "OrderDrink", new { drink.ItemId, SessionId = Model.SessionId, ShopcartId = Model.ShopcartId})
                                     }
                                 </div>
                             }

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -34,12 +35,13 @@ namespace WebApp.VendingMachine
                     shopcartViewModel.ShopcartId = shopcart.ShopcartId;
                     shopcartViewModel.ClientMoney = shopcart.ClientMoney;
                     shopcartViewModel.OrderSum = shopcart.OrderSum;
+
                     shopcartViewModel.SessionId = sessionId;
 
                     if (shopcart.DrinksToClient != null)
                         foreach (var drinkToClient in shopcart.DrinksToClient)
                         {
-                            var drinkInVM = shopcartViewModel.ThisVM.Drinks.SingleOrDefault(dr => dr.ItemId == drinkToClient.ItemId);
+                            var drinkInVM = shopcartViewModel.ThisVM.Drinks.SingleOrDefault(dr => dr.Title == drinkToClient.Title);
                             drinkInVM.CountInVM -= drinkToClient.CountInVM;
                             if (drinkInVM.CountInVM < 0) { throw new Exception("Расхождение в количестве заказаных напитков и тех, которые содержаться в автомате."); }
                         }
@@ -74,8 +76,42 @@ namespace WebApp.VendingMachine
             return RedirectToIndex(sessionId, shopcartId);
         }
 
-        public IActionResult OrderDrink(int coinDenom, string sessionId, Guid shopcartId)
+        public IActionResult OrderDrink(int itemId, string sessionId, Guid shopcartId)
         {
+            if (string.IsNullOrEmpty(sessionId) || shopcartId == Guid.Empty) { throw new AccessViolationException(); }
+
+            var shopcart = GetShopcartFromCash(sessionId);
+
+            Func<int, object> UpCountDrink = delegate (int id)
+            {
+                shopcart.DrinksToClient.SingleOrDefault(dr => dr.ItemId == id).CountInVM++;
+                return null;
+            };
+
+            Func<int, object> AddDrinkToShopcart = delegate (int id)
+            {
+                var drinkToClient = Drink.GetDrinkObjectAsync(itemId, _context).Result;
+                drinkToClient.CountInVM = 1;
+                shopcart.DrinksToClient.Add(drinkToClient);
+                return null;
+            };
+
+            if (shopcart.DrinksToClient == null)
+            {
+                shopcart.DrinksToClient = new List<Drink>();
+                AddDrinkToShopcart(itemId);
+            }
+            else if (shopcart.DrinksToClient.Any(dr => dr.ItemId == itemId))
+            {
+                UpCountDrink(itemId);
+            }
+            else
+            {
+                AddDrinkToShopcart(itemId);
+            }
+
+            SetShopcartToCash(sessionId, shopcart);
+
             return RedirectToIndex(sessionId, shopcartId);
         }
 
@@ -90,6 +126,7 @@ namespace WebApp.VendingMachine
             return sessionId;
         }
 
+
         private ClientChopcartCash GetShopcartFromCash(string sessionId) =>
             SaveLoadFile.DeSerializeObjectFromXmlText<ClientChopcartCash>(HttpContext.Session.GetString(sessionId));
 
@@ -100,8 +137,11 @@ namespace WebApp.VendingMachine
         private VendingMachineViewModel GetThisVendingMachine() =>
             VendingMachineViewModel.GetDataFromBase(_context, _thisMachineGuid.Value.Value);
 
-        public IActionResult RedirectToIndex(string sessionId, Guid shopcartId) =>
+
+        private IActionResult RedirectToIndex(string sessionId, Guid shopcartId) =>
             RedirectToAction("Index", new RouteValueDictionary(new { SessionId = sessionId, ShopcartId = shopcartId }));
+
+
 
         #endregion
     }

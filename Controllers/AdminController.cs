@@ -361,13 +361,14 @@ namespace WebApp.VendingMachine
                 importDrink.IsAvailable = _context.Drinks.Where(dr => dr.Title == importDrink.Title).Count() > 0;
             }
 
-            CashImportData(sessionId, drDataFile, importImagesDirectory, vmImportDrinks.Drinks);
+            
+            CacheImportData(sessionId, drDataFile, importImagesDirectory, vmImportDrinks.Drinks);
             DeleteDirectory(importDirectory);
 
             return vmImportDrinks;
         }
 
-        private void CashImportData(string sessionId, string drDataFile, string importImagesDirectory, List<Drink> importDrinks)
+        private void CacheImportData(string sessionId, string drDataFile, string importImagesDirectory, List<Drink> importDrinks)
         {
             if (string.IsNullOrEmpty(sessionId) ||
                 String.IsNullOrEmpty(drDataFile) ||

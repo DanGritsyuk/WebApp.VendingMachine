@@ -1,109 +1,139 @@
 ﻿@using WebApp.VendingMachine
 @model ImportDrinksViewModel
 
+@{
+    Layout = null;
+}
+
 <!DOCTYPE html>
 
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title>Импорт</title>
+    <title>Administration</title>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
+    <script>
+        function check_uncheck_checkbox(isChecked) {
+            if (isChecked) {
+                $('input[name="drinksNames"]').each(function () {
+                    this.checked = true;
+                });
+            } else {
+                $('input[name="drinksNames"]').each(function () {
+                    this.checked = false;
+                });
+            }
+        }
+    </script>
+
 </head>
 <body>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>
-                    <h2>
-                        Импорт товаров
-                    </h2>
-                </th>
-                <th></th>
-            </tr>
-        </thead>
-
-        @if (Model == null)
-        {
-            <tbody>
+    <div style="margin-top:50px" class="container">
+        <table class="table">
+            <thead>
                 <tr>
-                    <td>
-                        <div class="col-md-4">
-                            @using (Html.BeginForm("ToImport", "Admin", FormMethod.Post, new { enctype = "multipart/form-data" }))
-                            {
-                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                                <input type="file" name="importFile" id="importFile" accept=".vm" />
-                                <div class="form-group">
-                                    <input type="submit" value="Загрузить" class="btn btn-primary" />
-                                </div>
-                            }
-                        </div>
-                    </td>
+                    <th>
+                        <h2>
+                            Импорт товаров
+                        </h2>
+                    </th>
+                    <th></th>
                 </tr>
-            </tbody>
-        }
-        else
-        {
-            <tbody>
-                <tr>
-                    <td>
-                        @using (Html.BeginForm("ConfirmedImport", "Admin", FormMethod.Post, new { enctype = "multipart/form-data" }))
-                        {
-                            <table>
-                                <tbody>
-                                    <tr>
-                                        <td>
-                                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                                            <input id="sessionId" name="sessionId" type="hidden" value="@Model.SessionId" />
-                                            <div class="form-group">
-                                                <input type="submit" value="Импортировать" class="btn btn-primary" />
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <h3>Наименование | </h3>
-                                        </td>
-                                        <td>
-                                            <h3>Цена | </h3>
-                                        </td>
-                                        <td>
-                                            <h3>Количество | </h3>
-                                        </td>
-                                        <td>
-                                            <div class="form-group form-check">
-                                                <label class="form-check-label">
-                                                    <input type="checkbox" checked="checked" class="form-check-input" />
-                                                </label>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    @foreach (var drink in Model.Drinks)
-                                    {
+            </thead>
+
+            @if (Model == null)
+            {
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="col-md-4">
+                                @using (Html.BeginForm("ToImport", "Admin", FormMethod.Post, new { id = "importFileForm", enctype = "multipart/form-data" }))
+                                {
+                                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                    <input type="file" id="importFile" name="importFile" onchange="this.form.submit()" accept=".vm" />
+                                }
+                            </div>
+                            <div class="col-md-4">
+                                <div style="margin-top:25px" class="form-group">                                    
+                                    <a asp-action="Index">Отмена</a>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            }
+            else
+            {
+                <tbody>
+                    <tr>
+                        <td>
+                            @using (Html.BeginForm("ConfirmedImport", "Admin", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                            {
+                                <table>
+                                    <tbody>
                                         <tr>
                                             <td>
-                                                @Html.Label(null, drink.Title, drink.IsAvailable ? new { @style="color:red" } : null)
+                                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                                <input id="sessionId" name="sessionId" type="hidden" value="@Model.SessionId" />
+                                                <div class="form-group">
+                                                    <input type="submit" value="Импортировать" class="btn btn-primary" />
+                                                </div>
                                             </td>
                                             <td>
-                                                @Html.DisplayFor(modelItem => drink.Price)
-                                            </td>
-                                            <td>
-                                                @Html.DisplayFor(modelItem => drink.Count)
-                                            </td>
-                                            <td>
-                                                <div class="form-group form-check">
-                                                    <label class="form-check-label">
-                                                        <input type="checkbox" id="drinksNames" name="drinksNames" value="@drink.Title" checked="checked" class="form-check-input" />
-                                                    </label>
+                                                <div style="margin-top:25px" class="form-group">
+                                                    <a asp-action="Index">Отмена</a>
                                                 </div>
                                             </td>
                                         </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        }
-                    </td>
-                </tr>
-            </tbody>
-        }
-    </table>
+                                        <tr>
+                                            <td>
+                                                <h3>Наименование</h3>
+                                            </td>
+                                            <td>
+                                                <h3>Цена</h3>
+                                            </td>
+                                            <td>
+                                                <h3>Количество</h3>
+                                            </td>
+                                            <td>
+                                                <input type="checkbox" name="checkall" id="checkall" onClick="check_uncheck_checkbox(this.checked);" />
+                                            </td>
+                                        </tr>
+                                        @foreach (var drink in Model.Drinks)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    @Html.Label(null, drink.Title, drink.IsAvailable ? new { @style = "color:red" } : null)
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => drink.Price)
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => drink.Count)
+                                                </td>
+                                                <td>
+                                                    <div class="form-group form-check">
+                                                        <label class="form-check-label">
+                                                            <input type="checkbox" id="drinksNames" name="drinksNames" value="@drink.Title" checked="checked" class="form-check-input" />
+                                                        </label>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            }
+                        </td>
+                    </tr>
+                </tbody>
+            }
+        </table>
+    </div>
 </body>
 </html>

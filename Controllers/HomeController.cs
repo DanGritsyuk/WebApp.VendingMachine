@@ -28,7 +28,7 @@ namespace WebApp.VendingMachine
 
             if (!string.IsNullOrEmpty(sessionId))
             {
-                var shopcart = GetDataObjectFromCash<ClientChopcartCash>(sessionId);
+                var shopcart = GetDataObjectFromCache<ClientChopcartCache>(sessionId);
 
                 if (shopcart.ShopcartId == shopcartId)
                 {
@@ -57,9 +57,9 @@ namespace WebApp.VendingMachine
 
         public IActionResult AddCoin(int coinDenom, string sessionId, Guid shopcartId)
         {
-            if (sessionId == "New") { sessionId = CreateNewClientChopcartCash(shopcartId); }
+            if (sessionId == "New") { sessionId = CreateNewClientChopcartCache(shopcartId); }
 
-            var shopcart = GetDataObjectFromCash<ClientChopcartCash>(sessionId);
+            var shopcart = GetDataObjectFromCache<ClientChopcartCache>(sessionId);
 
             if (shopcart.ShopcartId != shopcartId)
             {
@@ -71,7 +71,7 @@ namespace WebApp.VendingMachine
             if (coin != null) { coin.Count++; }
             _context.SaveChanges();
 
-            SetDataObjectToCash(sessionId, shopcart);
+            SetDataObjectToCache(sessionId, shopcart);
 
             return RedirectToIndex(sessionId, shopcartId);
         }
@@ -80,7 +80,7 @@ namespace WebApp.VendingMachine
         {
             if (string.IsNullOrEmpty(sessionId) || shopcartId == Guid.Empty) { throw new AccessViolationException(); }
 
-            var shopcart = GetDataObjectFromCash<ClientChopcartCash>(sessionId);
+            var shopcart = GetDataObjectFromCache<ClientChopcartCache>(sessionId);
 
             Func<int, object> UpCountDrink = delegate (int id)
             {
@@ -111,7 +111,7 @@ namespace WebApp.VendingMachine
                 AddDrinkToShopcart(itemId);
             }
 
-            SetDataObjectToCash(sessionId, shopcart);
+            SetDataObjectToCache(sessionId, shopcart);
 
             return RedirectToIndex(sessionId, shopcartId);
         }
@@ -120,39 +120,41 @@ namespace WebApp.VendingMachine
         {
             if (string.IsNullOrEmpty(sessionId) || shopcartId == Guid.Empty) { throw new AccessViolationException(); }
 
-            var shopcart = GetDataObjectFromCash<ClientChopcartCash>(sessionId);
+            var shopcart = GetDataObjectFromCache<ClientChopcartCache>(sessionId);
 
             GetDrinkToClient(shopcart.DrinksToClient);
-            SetDataObjectToCash("Drinks-" + sessionId, shopcart.DrinksToClient);
+            SetDataObjectToCache("Drinks-" + sessionId, shopcart.DrinksToClient);
 
             var clientChangeCoints = GetChangeToClient(shopcart.ClientMoney - shopcart.OrderSum, _context.Coins.Where(cn => cn.Count > 0 && cn.vendingMachine == GetThisVendingMachine()).ToList());
-            SetDataObjectToCash("Coins-" + sessionId, clientChangeCoints);
+            SetDataObjectToCache("Coins-" + sessionId, clientChangeCoints);
 
-            RemoveCash(sessionId);
+            RemoveCache(sessionId);
 
             return RedirectToAction("EndPurchase", new RouteValueDictionary(new { SessionId = sessionId })); ;
         }
 
         public IActionResult CancelPurchase(string sessionId, Guid shopcartId)
         {
-            var shopcart = GetDataObjectFromCash<ClientChopcartCash>(sessionId);
+            var shopcart = GetDataObjectFromCache<ClientChopcartCache>(sessionId);
 
             GetChangeToClient(shopcart.ClientMoney - shopcart.OrderSum, _context.Coins.Where(cn => cn.Count > 0 && cn.vendingMachine == GetThisVendingMachine()).ToList());
-            RemoveCash(sessionId);
-            sessionId = CreateNewClientChopcartCash(shopcartId);
+            RemoveCache(sessionId);
+            sessionId = CreateNewClientChopcartCache(shopcartId);
 
             return RedirectToIndex(sessionId, shopcartId);
         }
 
         public IActionResult EndPurchase(string sessionId)
         {
-            var h = GetDataObjectFromCash<List<Drink>>("Drinks-" + sessionId);
-            var c = GetDataObjectFromCash<List<Coin>>("Coins-" + sessionId);
+            var purchasedDrinks = GetDataObjectFromCache<List<Drink>>("Drinks-" + sessionId);
+            var ChangeCoins = GetDataObjectFromCache<List<Coin>>("Coins-" + sessionId);
 
-            RemoveCash("Drinks-" + sessionId);
-            RemoveCash("Coins-" + sessionId);
+            var purchasedInfo = new Tuple<List<Drink>, List<Coin>>(purchasedDrinks, ChangeCoins);
 
-            return View();
+            RemoveCache("Drinks-" + sessionId);
+            RemoveCache("Coins-" + sessionId);
+
+            return View(purchasedInfo);
         }
 
         #region Secondary_functions
@@ -226,23 +228,23 @@ namespace WebApp.VendingMachine
             coinsInVM = coinsInVM.OrderByDescending(cn => Sort((cn.Denomination * cn.Count) - grafStartPoint)).ThenByDescending(cn => cn.Denomination).ToList();
         }
 
-        private string CreateNewClientChopcartCash(Guid shopcartId)
+        private string CreateNewClientChopcartCache(Guid shopcartId)
         {
             string sessionId = DateTime.Now.ToString().Replace(" ", "").Replace(":", "");
 
-            SetDataObjectToCash(sessionId, new ClientChopcartCash(shopcartId));
+            SetDataObjectToCache(sessionId, new ClientChopcartCache(shopcartId));
 
             return sessionId;
         }
 
 
-        private T GetDataObjectFromCash<T>(string sessionId) =>
+        private T GetDataObjectFromCache<T>(string sessionId) =>
             SaveLoadFile.DeSerializeObjectFromXmlText<T>(HttpContext.Session.GetString(sessionId));
 
-        private void SetDataObjectToCash<T>(string sessionId, T odataObj) =>
+        private void SetDataObjectToCache<T>(string sessionId, T odataObj) =>
             HttpContext.Session.SetString(sessionId, SaveLoadFile.SerializeObjectToXmlText(odataObj));
 
-        private void RemoveCash(string sessionId) => HttpContext.Session.Remove(sessionId);
+        private void RemoveCache(string sessionId) => HttpContext.Session.Remove(sessionId);
 
         private VendingMachineViewModel GetThisVendingMachine() =>
             VendingMachineViewModel.GetDataFromBase(_context, _thisMachineGuid.Value.Value);

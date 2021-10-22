@@ -6,11 +6,11 @@ using System.Runtime.Serialization;
 namespace WebApp.VendingMachine
 {
     [DataContract]
-    public class ClientChopcartCash
+    public class ClientChopcartCache
     {
-        public ClientChopcartCash() { }
+        public ClientChopcartCache() { }
 
-        public ClientChopcartCash(Guid shopcartId) 
+        public ClientChopcartCache(Guid shopcartId) 
         {
             ShopcartId = shopcartId;
             DrinksToClient = null;

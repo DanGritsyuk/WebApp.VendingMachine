@@ -8,128 +8,201 @@
     <head>
         <meta name="viewport" content="width-device-width" />
         <title>Vending Machine</title>
+        <link href="~/css/StyleCoin.css" rel="stylesheet" type="text/css" />
+        <link href="~/css/StyleButtons.css" rel="stylesheet" type="text/css" />
+        <link href="~/css/StyleText.css" rel="stylesheet" type="text/css" />
+        <link href="~/css/StyleHeader.css" rel="stylesheet" type="text/css" />
+        <link href="~/css/flexboxgrid.css" rel="stylesheet" type="text/css" />
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+
     </head>
     <body>
-        @if (Model.ThisVM != null && Model.ThisVM.IsAvailable)
+        <header>
 
-        {
-
-            <div id="main-content">
-                <div id="container">
-                    @foreach (var coin in Model.ThisVM.Coins)
-                    {
-
-
-                        <div class="coin-item">
-                            <p>монета @coin.Denomination</p>
-                            @if (coin.IsAvailable == true)
+            <div class="wrapper">
+                <div class="inner-wrapper">
+                    <div class="landscape"></div>
+                </div>
+                <div class="nrw">
+                    <span class="new">
+                        <span class="letter">7</span>
+                        <span class="letter">/</span>
+                        <span class="letter">2</span>
+                        <span class="letter">4</span>
+                    </span>
+                    <span class="retro">
+                        <span class="letter">Х</span>
+                        <span class="letter">О</span>
+                        <span class="letter">Л</span>
+                        <span class="letter">Д</span>
+                        <span class="letter">Н</span>
+                        <span class="letter">Ы</span>
+                        <span class="letter">Е</span>
+                    </span>
+                    <span class="wave">
+                        <span class="letter">Н</span>
+                        <span class="letter">А</span>
+                        <span class="letter">П</span>
+                        <span class="letter">И</span>
+                        <span class="letter">Т</span>
+                        <span class="letter">К</span>
+                        <span class="letter">И</span>
+                    </span>
+                </div>
+                <div class="triangle"></div>
+            </div>
+        </header>
+        <div class="container">
+            <div class="row">
+                @if (Model.ThisVM != null && Model.ThisVM.IsAvailable)
+                {
+                    <div id="items-area" class="col-xs-8 col-md-4 col-lg-3">
+                        <div class="row">
+                            @foreach (var drink in Model.ThisVM.Drinks)
                             {
-                                @Html.ActionLink("Пополнить баланс", "AddCoin", new
+
+                                @if (drink.IsAvailable && drink.Count > 0 && drink.Price <= (Model.ClientMoney - Model.OrderSum))
                                 {
-                                    CoinDenom = coin.Denomination,
-                                    SessionId = Model.SessionId != null ? Model.SessionId : "New",
-                                    ShopcartId = Model.ShopcartId != Guid.Empty ? Model.ShopcartId : Guid.NewGuid()
-                                })
-                            }
-                            else
-                            {
-                                <p>Монета заблокирована</p>
+                                    <div class="drink-items col-xs-4 col-md-6 col-lg-12">
+
+                                        <a href="@Url.Action("OrderDrink", "Home", new {
+                                    drink.ItemId,
+                                    SessionId = Model.SessionId,
+                                    ShopcartId = Model.ShopcartId })">
+                                            <img src="@drink.ImageUrl" class="drink-image">
+                                            <p><h4>@drink.Title</h4></p>
+                                        </a>
+                                        <p>Цена: @drink.Price</p>
+                                        <p>Количество: @drink.Count</p>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="drink-items col-xs-4 col-md-6 col-lg-12">
+                                        <img src="@drink.ImageUrl" class="drink-image gray-filter">
+                                        <p><h4>@drink.Title</h4></p>
+                                        <p>Цена: @drink.Price</p>
+                                        <p>Количество: @drink.Count</p>
+                                    </div>
+                                }
                             }
                         </div>
-                    }
-                </div>
-                    <div class="balance-area">
-                        <p class="balance">Внесено: @Model.ClientMoney</p>
-                        <br />
-                        @if (Model.ClientMoney > 0)
-                        {
-                            <table>
-                                <tr>
-                                    @if (Model.OrderSum > 0)
+                    </div>
+                    <div id="main-content" class="col-xs-2 col-md-2 col-lg-2">
+                        <div class="coin-container">
+                            <h1>Оплата</h1>
+
+                            <div class="row">
+                                @foreach (var coin in Model.ThisVM.Coins)
+                                {
+
+                                    <div id="main-content" class="col-xs-2 col-md-3 col-lg-6">
+                                        @if (coin.IsAvailable == true)
+                                        {
+                                            <a href="@Url.Action("AddCoin", "Home", new {
+                                    CoinDenom = coin.Denomination,
+                                    SessionId = Model.SessionId != null ? Model.SessionId : "New",
+                                    ShopcartId = Model.ShopcartId != Guid.Empty ? Model.ShopcartId : Guid.NewGuid()})">
+
+
+
+                                                @if (coin.Denomination == 10)
+                                                {
+                                                    <div class="coin gold"><p>@coin.Denomination</p></div>
+                                                }
+                                                else if (coin.Denomination == 1)
+                                                {
+                                                    <div class="coin bronze"><p>@coin.Denomination</p></div>
+                                                }
+                                                else
+                                                {
+                                                    <div class="coin silver"><p>@coin.Denomination</p></div>
+                                                }
+                                            </a>
+
+                                        }
+                                        else
+                                        {
+
+                                            <div class="coinDisable gray"><p>@coin.Denomination</p></div>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                            <div style="text-align:center">
+                                <h2>Внесено: @Model.ClientMoney</h2>
+                                <h2>К оплате: @Model.OrderSum</h2>
+                                <h2>Остаток: @string.Concat(Model.ClientMoney - Model.OrderSum)</h2>
+                            </div>
+                            <div class="row">
+                                <div class="button-style">
+                                    @if (Model.ClientMoney > 0)
                                     {
-                                        <td>
+
+
+                                        @if (Model.OrderSum > 0)
+                                        {
+
                                             @using (Html.BeginForm("CompletePurchase", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
                                             {
+                                                <div class="col-xs-12 col-md-12 col-lg-12">
+                                                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                                    <input type="hidden" asp-for="SessionId" />
+                                                    <input type="hidden" asp-for="ShopcartId" />
+                                                    <div class="form-group">
+                                                        <input type="submit" value="Купить" class="btn btn-primary" />
+                                                    </div>
+                                                </div>
+                                            }
+
+                                        }
+                                        else
+                                        {
+
+                                            <div class="col-xs-12 col-md-12 col-lg-12">
+                                                <input type="submit" value="Купить" class="btn btn-primary" disabled />
+                                            </div>
+
+                                        }
+
+                                        @using (Html.BeginForm("CancelPurchase", "Home", FormMethod.Post, new { enctype = "multipart/form-data", style = "margin-bottom:0px;" }))
+                                        {
+                                            <div class="col-xs-12 col-md-12 col-lg-12">
                                                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                                                 <input type="hidden" asp-for="SessionId" />
                                                 <input type="hidden" asp-for="ShopcartId" />
                                                 <div class="form-group">
-                                                    <input type="submit" value="Купить" class="btn btn-primary" />
+                                                    <input type="submit" value="Отмена" class="btn btn-primary" />
                                                 </div>
-                                            }
-                                        </td>
+                                            </div>
+                                        }
                                     }
                                     else
                                     {
-                                        <td>
-                                            <div>
-                                                <input type="submit" value="Купить" class="btn btn-primary" disabled />
-                                            </div>                                            
-                                        </td>
-                                    }
-                                    <td>
-                                        @using (Html.BeginForm("CancelPurchase", "Home", FormMethod.Post, new { enctype = "multipart/form-data", style = "margin-bottom:0px;"}))
-                                        {
-                                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                                            <input type="hidden" asp-for="SessionId" />
-                                            <input type="hidden" asp-for="ShopcartId" />
-                                            <div class="form-group">
-                                                <input type="submit" value="Отмена" class="btn btn-primary" />
-                                            </div>
-                                        }
-                                    </td>
-                                </tr>
-                            </table>
-                            <table>
-                                <tr>
-                                    <td>
-                                        <p class="balance">К оплате: @Model.OrderSum</p>
-                                        <p class="balance">Остаток: @string.Concat(Model.ClientMoney - Model.OrderSum) </p>
-                                    </td>
+                                        <div class="col-xs-12 col-md-12 col-lg-12">
+                                            <input type="submit" value="Купить" class="btn btn-primary" disabled />
+                                        </div>
+                                        <div class="col-xs-12 col-md-12 col-lg-12">
+                                            <input type="submit" value="Отмена" class="btn btn-primary" disabled />
+                                        </div>
 
-                                </tr>
-                            </table>
-                        }
-                        else
-                        {
-                            <table>
-                                <tr>
-                                    <td>
-                                        <input type="submit" value="Купить" class="btn btn-primary" disabled />
-                                    </td>
-                                    <td>
-                                        <input type="submit" value="Отмена" class="btn btn-primary" disabled />
-                                    </td>
-                                </tr>
-                            </table>
-                        }
-
-                    </div>
-                    <div class="items-area">
-                        @foreach (var drink in Model.ThisVM.Drinks)
-                        {
-
-                            @if (drink.IsAvailable)
-                            {
-                                <div class="drink-item">
-                                    <img style="width:150px;height:auto" src="@drink.ImageUrl" class="drink-image">
-                                    <p><h4>@drink.Title</h4></p>
-                                    <p>Цена: @drink.Price</p>
-                                    <p>Количество: @drink.Count</p>
-                                    @if (drink.Count > 0 && (Model.ClientMoney - Model.OrderSum) >= drink.Price)
-                                    {
-                                        @Html.ActionLink("Выбрать", "OrderDrink", new { drink.ItemId, SessionId = Model.SessionId, ShopcartId = Model.ShopcartId })
                                     }
                                 </div>
-                            }
-                        }
-                    </div>                
-            </div>
+                            </div>
+                        </div>
 
-        }
-        else
-        {
-            <h1>Торговый автомат не работает</h1>
-        }
+                    </div>
+                }
+                else
+                {
+                        <div id="main-content" class="ex-message col-xs-12 col-md-12 col-lg-12">
+                            <h1>Торговый автомат не работает</h1>
+                        </div>
+
+                }
+            </div>
+        </div>
     </body>
 </html>

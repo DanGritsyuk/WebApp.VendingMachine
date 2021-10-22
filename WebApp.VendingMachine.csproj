@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Data\SessionCashObject.cs" />
+    <Compile Remove="Data\SessionCacheObject.cs" />
   </ItemGroup>
 
   <ItemGroup>

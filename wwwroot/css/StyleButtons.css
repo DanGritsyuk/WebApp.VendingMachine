@@ -1,0 +1,119 @@
+﻿.button-style {
+    left: 50%;
+    top: 50%;
+    justify-content: center;
+    -moz-transform: translate(-50%, -50%);
+    -o-transform: translate(-50%, -50%);
+    width: 400px;
+}
+
+input:focus {
+    outline: 0;
+}
+
+ul {
+    list-style: none;
+}
+
+input[type="submit"] {
+    display: block;
+    cursor: pointer;
+    font-size: 25px;
+    margin: 0 auto;
+    width: 90%;
+    height: 50px;
+    font-family: Helvetica;
+    border-bottom: 5px solid steelblue;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    background: linear-gradient(#5FDDFF,#53ADDF);
+    color: white;
+    border-radius: 10px;
+    box-shadow: 0px 2px 10px grey;
+    transition: 150ms ease;
+    font-weight: bold;
+}
+
+    input[type="submit"]:active {
+        border: none;        
+        border-bottom: 2px solid steelblue;
+        box-shadow: 0px 1px 5px grey;
+        background: linear-gradient(#53AFFF,#5FCDFF);
+        color: #FFF;
+    }
+
+    input[type="submit"]:disabled,
+    input[type="submit"][disabled] {
+        display: block;
+        cursor: default;
+        margin: 0 auto;
+        height: 50px;
+        font-family: Helvetica;
+        border-bottom: 5px solid steelblue;
+        border-top: none;
+        border-left: none;
+        border-right: none;
+        background: linear-gradient(#174582,#17729c);
+        color: #223b42;
+        border-radius: 10px;
+        box-shadow: 0px 2px 10px grey;
+        transition: 150ms ease;
+        font-weight: bold;
+    }
+
+.btn-3d-sub {
+    display: block;
+    margin: 0 auto;
+    width: 50%;
+    height: 50px;
+    font-family: Helvetica;
+    border-bottom: 5px solid #173814;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    background: linear-gradient(#469e3f,#255b20);
+    color: white;
+    border-radius: 10px;
+    box-shadow: 0px 2px 10px grey;
+    transition: 150ms ease;
+    text-align: center;
+    line-height: 50px;
+    font-weight: bold;
+}
+
+    .btn-3d-sub:active {
+        border: none;
+        border-bottom: 2px solid steelblue;
+        box-shadow: 0px 1px 5px grey;
+        background: linear-gradient(#255b20,#469e3f);
+        color: #FFF;
+    }
+
+.btn-3d-can {
+    display: block;
+    margin: 0 auto;
+    width: 50%;
+    height: 50px;
+    font-family: Helvetica;
+    border-bottom: 5px solid #2d0707;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    background: linear-gradient(#991b1b,#490e0e);
+    color: white;
+    border-radius: 10px;
+    box-shadow: 0px 2px 10px grey;
+    transition: 150ms ease;
+    text-align: center;
+    line-height: 50px;
+    font-weight: bold;
+}
+
+    .btn-3d-can:active {
+        border: none;
+        border-bottom: 2px solid #490e0e;
+        box-shadow: 0px 1px 5px grey;
+        background: linear-gradient(#490e0e,#991b1b);
+        color: #FFF;
+    }

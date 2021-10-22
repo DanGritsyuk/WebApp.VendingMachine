@@ -157,6 +157,9 @@ namespace WebApp.VendingMachine
             return View(purchasedInfo);
         }
 
+        public IActionResult ReturnBackVendingMashine() => RedirectToIndex(null, Guid.Empty);
+        
+
         #region Secondary_functions
 
         private void GetDrinkToClient(List<Drink> drinksToClient)

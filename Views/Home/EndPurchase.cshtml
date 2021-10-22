@@ -19,41 +19,43 @@
 
     </head>
     <body>
-        <header>
+        <a style="text-decoration: none" href="@Url.Action("ReturnBackVendingMashine", "Home")">
+            <header>
 
-            <div class="wrapper">
-                <div class="inner-wrapper">
-                    <div class="landscape"></div>
+                <div class="wrapper">
+                    <div class="inner-wrapper">
+                        <div class="landscape"></div>
+                    </div>
+                    <div class="nrw">
+                        <span class="new">
+                            <span class="letter">7</span>
+                            <span class="letter">/</span>
+                            <span class="letter">2</span>
+                            <span class="letter">4</span>
+                        </span>
+                        <span class="retro">
+                            <span class="letter">Х</span>
+                            <span class="letter">О</span>
+                            <span class="letter">Л</span>
+                            <span class="letter">Д</span>
+                            <span class="letter">Н</span>
+                            <span class="letter">Ы</span>
+                            <span class="letter">Е</span>
+                        </span>
+                        <span class="wave">
+                            <span class="letter">Н</span>
+                            <span class="letter">А</span>
+                            <span class="letter">П</span>
+                            <span class="letter">И</span>
+                            <span class="letter">Т</span>
+                            <span class="letter">К</span>
+                            <span class="letter">И</span>
+                        </span>
+                    </div>
+                    <div class="triangle"></div>
                 </div>
-                <div class="nrw">
-                    <span class="new">
-                        <span class="letter">7</span>
-                        <span class="letter">/</span>
-                        <span class="letter">2</span>
-                        <span class="letter">4</span>
-                    </span>
-                    <span class="retro">
-                        <span class="letter">Х</span>
-                        <span class="letter">О</span>
-                        <span class="letter">Л</span>
-                        <span class="letter">Д</span>
-                        <span class="letter">Н</span>
-                        <span class="letter">Ы</span>
-                        <span class="letter">Е</span>
-                    </span>
-                    <span class="wave">
-                        <span class="letter">Н</span>
-                        <span class="letter">А</span>
-                        <span class="letter">П</span>
-                        <span class="letter">И</span>
-                        <span class="letter">Т</span>
-                        <span class="letter">К</span>
-                        <span class="letter">И</span>
-                    </span>
-                </div>
-                <div class="triangle"></div>
-            </div>
-        </header>
+            </header>
+        </a>
         @if (Model.Item1 == null)
         {
             <h1>
@@ -94,7 +96,15 @@
             </div>
             <div class="row">
                 <div id="main-content" class="col-xs-12 col-md-12 col-lg-12">
-                    <h1>ВАША СДАЧА</h1>
+                    @if (Model.Item2.Count > 0)
+                    {
+                        <h1>ВАША СДАЧА</h1>
+                    }
+                    else
+                    {
+                        <h1>ПОД РАСЧЕТ</h1>
+                    }
+
                 </div>
                 <div id="main-content" class="drink-image col-xs-2 col-md-3 col-lg-6">
                     @foreach (var coin in Model.Item2)

@@ -24,7 +24,7 @@ namespace WebApp.VendingMachine
 
         [NotMapped]
         public decimal Balance =>
-            Coins != null ? Coins.Where(cn => cn.vendingMachine.ItemId == ItemId).Sum(cn => cn.Denomination * cn.CountInVM) : 0;
+            Coins != null ? Coins.Where(cn => cn.vendingMachine.ItemId == ItemId).Sum(cn => cn.Denomination * cn.Count) : 0;
 
         public static Guid? GetThisMachineGuid()
         {

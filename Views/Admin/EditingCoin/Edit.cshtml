@@ -5,7 +5,7 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        @using (Html.BeginForm("EditingCoins", "Admin", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        @using (Html.BeginForm("ConfirmedEditCoins", "Admin", FormMethod.Post, new { enctype = "multipart/form-data" }))
         {
             <table class="table">
                 @if (Model != null)
@@ -31,7 +31,7 @@
                                 @Html.DisplayFor(m => m[i].Denomination)
                             </td>
                             <td>                                
-                                @Html.TextBoxFor(m => m[i].CountInVM, new { @class = "form-control" })
+                                @Html.TextBoxFor(m => m[i].Count, new { @class = "form-control" })
                             </td>
                             <td>
                                 @Html.CheckBoxFor(m => m[i].IsAvailable, new { @class = "form-control" })

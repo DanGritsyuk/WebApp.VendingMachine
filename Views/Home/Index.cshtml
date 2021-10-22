@@ -10,7 +10,8 @@
         <title>Vending Machine</title>
     </head>
     <body>
-        @if (Model != null || Model.ThisVM.IsAvailable)
+        @if (Model.ThisVM != null && Model.ThisVM.IsAvailable)
+
         {
 
             <div id="main-content">
@@ -37,12 +38,72 @@
                         </div>
                     }
                 </div>
-                @if (Model != null)
-                {
                     <div class="balance-area">
                         <p class="balance">Внесено: @Model.ClientMoney</p>
                         <br />
-                        <a href="/Home/TakeTips"><input type="button" value="Забрать сдачу"></a>
+                        @if (Model.ClientMoney > 0)
+                        {
+                            <table>
+                                <tr>
+                                    @if (Model.OrderSum > 0)
+                                    {
+                                        <td>
+                                            @using (Html.BeginForm("CompletePurchase", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                                            {
+                                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                                <input type="hidden" asp-for="SessionId" />
+                                                <input type="hidden" asp-for="ShopcartId" />
+                                                <div class="form-group">
+                                                    <input type="submit" value="Купить" class="btn btn-primary" />
+                                                </div>
+                                            }
+                                        </td>
+                                    }
+                                    else
+                                    {
+                                        <td>
+                                            <div>
+                                                <input type="submit" value="Купить" class="btn btn-primary" disabled />
+                                            </div>                                            
+                                        </td>
+                                    }
+                                    <td>
+                                        @using (Html.BeginForm("CancelPurchase", "Home", FormMethod.Post, new { enctype = "multipart/form-data", style = "margin-bottom:0px;"}))
+                                        {
+                                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                            <input type="hidden" asp-for="SessionId" />
+                                            <input type="hidden" asp-for="ShopcartId" />
+                                            <div class="form-group">
+                                                <input type="submit" value="Отмена" class="btn btn-primary" />
+                                            </div>
+                                        }
+                                    </td>
+                                </tr>
+                            </table>
+                            <table>
+                                <tr>
+                                    <td>
+                                        <p class="balance">К оплате: @Model.OrderSum</p>
+                                        <p class="balance">Остаток: @string.Concat(Model.ClientMoney - Model.OrderSum) </p>
+                                    </td>
+
+                                </tr>
+                            </table>
+                        }
+                        else
+                        {
+                            <table>
+                                <tr>
+                                    <td>
+                                        <input type="submit" value="Купить" class="btn btn-primary" disabled />
+                                    </td>
+                                    <td>
+                                        <input type="submit" value="Отмена" class="btn btn-primary" disabled />
+                                    </td>
+                                </tr>
+                            </table>
+                        }
+
                     </div>
                     <div class="items-area">
                         @foreach (var drink in Model.ThisVM.Drinks)
@@ -54,16 +115,15 @@
                                     <img style="width:150px;height:auto" src="@drink.ImageUrl" class="drink-image">
                                     <p><h4>@drink.Title</h4></p>
                                     <p>Цена: @drink.Price</p>
-                                    <p>Количество: @drink.CountInVM</p>
-                                    @if (drink.CountInVM > 0 && (Model.ClientMoney - Model.OrderSum) >= drink.Price)
+                                    <p>Количество: @drink.Count</p>
+                                    @if (drink.Count > 0 && (Model.ClientMoney - Model.OrderSum) >= drink.Price)
                                     {
-                                        @Html.ActionLink("Выбрать", "OrderDrink", new { drink.ItemId, SessionId = Model.SessionId, ShopcartId = Model.ShopcartId})
+                                        @Html.ActionLink("Выбрать", "OrderDrink", new { drink.ItemId, SessionId = Model.SessionId, ShopcartId = Model.ShopcartId })
                                     }
                                 </div>
                             }
                         }
-                    </div>
-                }
+                    </div>                
             </div>
 
         }

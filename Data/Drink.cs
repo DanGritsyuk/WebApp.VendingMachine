@@ -10,12 +10,12 @@ namespace WebApp.VendingMachine
     [DataContract]
     public class Drink
     {
-        public Drink(string title, string imageUrl, decimal price, int countInVM, bool isAvailable)
+        public Drink(string title, decimal price, int count, bool isAvailable = false, string imageUrl = null)
         {
             Title = title;
             ImageUrl = imageUrl;
             Price = price;
-            CountInVM = countInVM;
+            Count = count;
             IsAvailable = isAvailable;
         }
 
@@ -43,11 +43,12 @@ namespace WebApp.VendingMachine
         public decimal Price { get; set; }
 
         [Required]
+        [Column("CountInVM")]
         [DataMember(Name = "Count")]
         ///<summary>
         /// Количество напитка в торговом автомате
         /// </summary>
-        public int CountInVM { get; set; }
+        public int Count { get; set; }
 
         [Required]
         [IgnoreDataMember]

@@ -101,7 +101,7 @@ namespace WebApp.VendingMachine
 
         #region EditingDrink
 
-        public async Task<IActionResult> CreateDrink(string title, decimal price, int countInVM, bool isAvailable, IFormFile image)
+        public async Task<IActionResult> CreateDrink(string title, decimal price, int count, bool isAvailable, IFormFile image)
         {
             if (ModelState.IsValid &&
                 !string.IsNullOrEmpty(title) &&
@@ -110,7 +110,7 @@ namespace WebApp.VendingMachine
             {
                 var path = LoadImageAsync(title, image);
 
-                var drink = new Drink(title, await path, price, countInVM, isAvailable);
+                var drink = new Drink(title, price, count, isAvailable, await path);
                 drink.vendingMachine = _context.VendingMachineViewModel.Where(vm => vm.ItemId == _thisMachineGuid.Value).FirstOrDefault();
 
                 _context.Add(drink);
@@ -123,7 +123,7 @@ namespace WebApp.VendingMachine
         // POST: Admin/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditDrink(int itemId, string title, decimal price, int countInVM, bool isAvailable, IFormFile image)
+        public async Task<IActionResult> EditDrink(int itemId, string title, decimal price, int count, bool isAvailable, IFormFile image)
         {
             Drink drink = await Drink.GetDrinkObjectAsync(itemId, _context);
 
@@ -135,8 +135,8 @@ namespace WebApp.VendingMachine
                 if (drink.Price != price)
                     drink.Price = price;
 
-                if (drink.CountInVM != countInVM)
-                    drink.CountInVM = countInVM;
+                if (drink.Count != count)
+                    drink.Count = count;
 
                 if (drink.IsAvailable != isAvailable)
                     drink.IsAvailable = isAvailable;
@@ -212,12 +212,15 @@ namespace WebApp.VendingMachine
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditingCoins(List<Coin> coins)
+        public async Task<IActionResult> ConfirmedEditCoins(List<Coin> coins)
         {
             foreach (var coin in coins)
             {
-                _context.Update(coin);
-                await _context.SaveChangesAsync();
+                if(coin.Count >= 0)
+                {
+                    _context.Update(coin);
+                    await _context.SaveChangesAsync();
+                }
             }
 
             return EditCoins();
@@ -257,8 +260,8 @@ namespace WebApp.VendingMachine
                 {
                     if (drinkForUpdate.Price != importDrink.Price)
                         drinkForUpdate.Price = importDrink.Price;
-                    if (drinkForUpdate.CountInVM != importDrink.CountInVM)
-                        drinkForUpdate.CountInVM = importDrink.CountInVM;
+                    if (drinkForUpdate.Count != importDrink.Count)
+                        drinkForUpdate.Count = importDrink.Count;
                     if (drinkForUpdate.ImageUrl != importDrink.ImageUrl)
                     {
                         DeleteImage(drinkForUpdate.ImageUrl);
@@ -401,9 +404,7 @@ namespace WebApp.VendingMachine
             Directory.Delete(targetDir, false);
         }
 
-        #endregion
-
-        
+        #endregion        
 
         private async Task<string> LoadImageAsync(string title, IFormFile image)
         {

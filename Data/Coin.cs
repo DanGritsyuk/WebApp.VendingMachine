@@ -8,11 +8,12 @@ namespace WebApp.VendingMachine
     {
         public Coin() { }
 
-        public Coin(int denomination, int countInVM, bool isAvailable)
+        public Coin(int denomination, int count, bool isAvailable = false, int itemId = 0)
         {
             Denomination = denomination;
-            CountInVM = countInVM;
+            Count = count;
             IsAvailable = isAvailable;
+            ItemId = itemId;
         }
 
         [Key]
@@ -35,10 +36,11 @@ namespace WebApp.VendingMachine
         public bool IsAvailable { get; set; }
 
         [Required]
+        [Column("CountInVM")]
         /// <summary>
-        /// количество монет в торговом автомате
+        /// количество монет
         /// </summary>
-        public int CountInVM { get; set; }
+        public int Count { get; set; }
 
         /// <summary>
         /// навигационное свойство

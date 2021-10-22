@@ -27,6 +27,6 @@ namespace WebApp.VendingMachine
         public decimal ClientMoney { get; set; }
 
         [IgnoreDataMember]
-        public decimal OrderSum => DrinksToClient != null ? DrinksToClient.Sum(dr => dr.Price * dr.CountInVM) : 0;
+        public decimal OrderSum => DrinksToClient != null ? DrinksToClient.Sum(dr => dr.Price * dr.Count) : 0;
     }
 }

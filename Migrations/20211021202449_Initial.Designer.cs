@@ -10,7 +10,7 @@ using WebApp.VendingMachine;
 namespace WebApp.VendingMachine.Migrations
 {
     [DbContext(typeof(VendingMachineContext))]
-    [Migration("20211020192158_Initial")]
+    [Migration("20211021202449_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -28,8 +28,9 @@ namespace WebApp.VendingMachine.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("CountInVM")
-                        .HasColumnType("int");
+                    b.Property<int>("Count")
+                        .HasColumnType("int")
+                        .HasColumnName("CountInVM");
 
                     b.Property<int>("Denomination")
                         .HasColumnType("int");
@@ -54,8 +55,9 @@ namespace WebApp.VendingMachine.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("CountInVM")
-                        .HasColumnType("int");
+                    b.Property<int>("Count")
+                        .HasColumnType("int")
+                        .HasColumnName("CountInVM");
 
                     b.Property<string>("ImageUrl")
                         .IsRequired()

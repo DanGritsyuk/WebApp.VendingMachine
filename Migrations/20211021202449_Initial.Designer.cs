@@ -9,7 +9,7 @@ using WebApp.VendingMachine;
 
 namespace WebApp.VendingMachine.Migrations
 {
-    [DbContext(typeof(VendingMachineContext))]
+    [DbContext(typeof(VMDataBaseContext))]
     [Migration("20211021202449_Initial")]
     partial class Initial
     {

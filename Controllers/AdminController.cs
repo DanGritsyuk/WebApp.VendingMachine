@@ -9,28 +9,40 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting;
 using System.Collections.Generic;
 using static System.Net.Mime.MediaTypeNames;
+using Microsoft.AspNetCore.Routing;
 
 namespace WebApp.VendingMachine
 {
     public class AdminController : Controller
     {
-        public AdminController(VendingMachineContext context, IWebHostEnvironment appEnvironment)
+        public AdminController(VMDataBaseContext context, IWebHostEnvironment appEnvironment)
         {
             _context = context;
             _thisMachineGuid = new Lazy<Guid?>(VendingMachineViewModel.GetThisMachineGuid);
             _appEnvironment = appEnvironment;
         }
 
-        private readonly VendingMachineContext _context;
+        private readonly VMDataBaseContext _context;
         private readonly Lazy<Guid?> _thisMachineGuid;
         private readonly IWebHostEnvironment _appEnvironment;
+        private readonly string _user = AdminAccess.UserName;
+        private readonly Guid _accessKey = AdminAccess.AccessKey;
 
         #region Index
 
         // GET: Vending Machine
-        [Route("/Admin/Index",
-           Name = "Administration")]
-        public IActionResult Index() => View(GetThisVendingMachine());
+        public IActionResult Index(string user, Guid AccessKey)
+        {
+            if (user == _user && AccessKey == _accessKey)
+            {
+                return View(GetThisVendingMachine());
+            }
+            else
+            {
+                throw new AccessViolationException();
+            }
+
+        }
 
         // POST: Admin/Create
         [HttpPost]
@@ -55,7 +67,8 @@ namespace WebApp.VendingMachine
 
                 await CreateCoins();
 
-                return RedirectToAction(nameof(Index));
+
+                return RedirectToIndex();
             }
             else
             {
@@ -64,10 +77,7 @@ namespace WebApp.VendingMachine
         }
 
         // GET: Admin/EditingDrink/Create
-        public IActionResult Create()
-        {
-            return View("EditingDrink/Create");
-        }
+        public IActionResult Create() => View("EditingDrink/Create");
 
         // GET: Admin/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -77,7 +87,7 @@ namespace WebApp.VendingMachine
                 return NotFound();
             }
 
-            var drink = await Drink.GetDrinkObjectAsync(id.Value, _context);
+            var drink = await Drink.GetObjectDrinkAsync(id.Value, _context);
 
             if (drink == null) { return NotFound(); }
             else { return View("EditingDrink/Details", drink); }
@@ -91,10 +101,24 @@ namespace WebApp.VendingMachine
                 return NotFound();
             }
 
-            var drink = await Drink.GetDrinkObjectAsync(id.Value, _context);
+            var drink = await Drink.GetObjectDrinkAsync(id.Value, _context);
 
             if (drink == null) { return NotFound(); }
             else { return View("EditingDrink/Edit", drink); }
+        }
+
+        // GET: Admin/Delete/5
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var drink = await Drink.GetObjectDrinkAsync(id.Value, _context);
+
+            if (drink == null) { return NotFound(); }
+            else { return View("EditingDrink/Delete", drink); }
         }
 
         #endregion
@@ -111,13 +135,13 @@ namespace WebApp.VendingMachine
                 var path = LoadImageAsync(title, image);
 
                 var drink = new Drink(title, price, count, isAvailable, await path);
-                drink.vendingMachine = _context.VendingMachineViewModel.Where(vm => vm.ItemId == _thisMachineGuid.Value).FirstOrDefault();
+                drink.VendingMachine = _context.VendingMachineViewModel.Where(vm => vm.ItemId == _thisMachineGuid.Value).FirstOrDefault();
 
                 _context.Add(drink);
                 await _context.SaveChangesAsync();
             }
 
-            return RedirectToAction(nameof(Index));
+            return RedirectToIndex();
         }
 
         // POST: Admin/Edit/5
@@ -125,7 +149,7 @@ namespace WebApp.VendingMachine
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditDrink(int itemId, string title, decimal price, int count, bool isAvailable, IFormFile image)
         {
-            Drink drink = await Drink.GetDrinkObjectAsync(itemId, _context);
+            Drink drink = await Drink.GetObjectDrinkAsync(itemId, _context);
 
             if (ModelState.IsValid)
             {
@@ -151,21 +175,7 @@ namespace WebApp.VendingMachine
                 await _context.SaveChangesAsync();
             }
 
-            return RedirectToAction(nameof(Index));
-        }
-
-        // GET: Admin/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var drink = await Drink.GetDrinkObjectAsync(id.Value, _context);
-
-            if (drink == null) { return NotFound(); }
-            else { return View("EditingDrink/Delete", drink); }
+            return RedirectToIndex();
         }
 
         // POST: Admin/Delete/5
@@ -173,11 +183,11 @@ namespace WebApp.VendingMachine
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteDrinkConfirmedAsyng(int itemId)
         {
-            var drink = await Drink.GetDrinkObjectAsync(itemId, _context);
+            var drink = await Drink.GetObjectDrinkAsync(itemId, _context);
             DeleteImage(drink.ImageUrl);
             _context.Drinks.Remove(drink);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToIndex();
         }
 
         #endregion
@@ -201,22 +211,18 @@ namespace WebApp.VendingMachine
                 await _context.SaveChangesAsync();
             }
 
-            return RedirectToAction(nameof(Index));
+            return RedirectToIndex();
         }
 
-        public IActionResult EditCoins()
-        {
-            var vendingMachineViewModel = GetThisVendingMachine();
-
-            return View("EditingCoin/Edit", vendingMachineViewModel.Coins);
-        }
+        public IActionResult EditCoins() =>
+            View("EditingCoin/Edit", new Tuple<List<Coin>, string, Guid>( GetThisVendingMachine().Coins, _user, _accessKey ));
 
         [HttpPost]
         public async Task<IActionResult> ConfirmedEditCoins(List<Coin> coins)
         {
             foreach (var coin in coins)
             {
-                if(coin.Count >= 0)
+                if (coin.Count >= 0)
                 {
                     _context.Update(coin);
                     await _context.SaveChangesAsync();
@@ -230,7 +236,7 @@ namespace WebApp.VendingMachine
 
         #region ExportImportDrink
 
-        public IActionResult ExportList() => View("ExportImportDrinks/Export", _context.Drinks.ToList());
+        public IActionResult ExportList() => View("ExportImportDrinks/Export", new Tuple<List<Drink>, string, Guid>( _context.Drinks.ToList(), _user, _accessKey ));
         public IActionResult ImportList() => View("ExportImportDrinks/Import");
 
         public IActionResult ToExport(int[] ItemIds) =>
@@ -251,7 +257,7 @@ namespace WebApp.VendingMachine
                 if (!drinksNames.Any(dr => dr == importDrink.Title)) { continue; }
 
                 Drink drinkForUpdate = _context.Drinks.Where(dr => dr.Title == importDrink.Title).FirstOrDefault();
-                importDrink.vendingMachine = GetThisVendingMachine();
+                importDrink.VendingMachine = GetThisVendingMachine();
                 string imagePath = string.Concat(_appEnvironment.ContentRootPath, "/wwwroot", importDrink.ImageUrl);
 
                 string sessionKey = string.Concat(sessionId, importDrink.Title);
@@ -286,7 +292,7 @@ namespace WebApp.VendingMachine
             }
             HttpContext.Session.Remove(sessionId);
 
-            return RedirectToAction(nameof(Index));
+            return RedirectToIndex();
         }
 
         private byte[] CreateExportFile(int[] ItemIds)
@@ -308,7 +314,7 @@ namespace WebApp.VendingMachine
 
             foreach (var id in ItemIds)
             {
-                Drink drinkToExport = Drink.GetDrinkObjectAsync(id, _context).Result;
+                Drink drinkToExport = Drink.GetObjectDrinkAsync(id, _context).Result;
                 drinksToExport.Add(drinkToExport);
 
                 string fullImagePath = _appEnvironment.ContentRootPath + @"\wwwroot" + drinkToExport.ImageUrl;
@@ -361,7 +367,7 @@ namespace WebApp.VendingMachine
                 importDrink.IsAvailable = _context.Drinks.Where(dr => dr.Title == importDrink.Title).Count() > 0;
             }
 
-            
+
             CacheImportData(sessionId, drDataFile, importImagesDirectory, vmImportDrinks.Drinks);
             DeleteDirectory(importDirectory);
 
@@ -427,5 +433,8 @@ namespace WebApp.VendingMachine
 
         private VendingMachineViewModel GetThisVendingMachine() =>
             VendingMachineViewModel.GetDataFromBase(_context, _thisMachineGuid.Value.Value);
+
+        private IActionResult RedirectToIndex() =>
+            RedirectToAction(nameof(Index), new RouteValueDictionary(new { user = _user, AccessKey = _accessKey }));
     }
 }

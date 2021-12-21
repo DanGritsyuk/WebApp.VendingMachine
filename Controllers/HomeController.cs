@@ -1,24 +1,21 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace WebApp.VendingMachine
 {
     public class HomeController : Controller
     {
-        public HomeController(VendingMachineContext context)
+        public HomeController(VMDataBaseContext context)
         {
             _context = context;
             _thisMachineGuid = new Lazy<Guid?>(VendingMachineViewModel.GetThisMachineGuid);
         }
 
-        private readonly VendingMachineContext _context;
+        private readonly VMDataBaseContext _context;
         private readonly Lazy<Guid?> _thisMachineGuid;
 
         public ViewResult Index(string sessionId, Guid shopcartId)
@@ -57,7 +54,7 @@ namespace WebApp.VendingMachine
 
         public IActionResult AddCoin(int coinDenom, string sessionId, Guid shopcartId)
         {
-            if (sessionId == "New") { sessionId = CreateNewClientChopcartCache(shopcartId); }
+            if (sessionId == "New") { sessionId = CreateNewClientShopcartCache(shopcartId); }
 
             var shopcart = GetDataObjectFromCache<ClientChopcartCache>(sessionId);
 
@@ -66,10 +63,24 @@ namespace WebApp.VendingMachine
                 throw new AccessViolationException();
             }
 
-            shopcart.ClientMoney += coinDenom;
             Coin coin = _context.Coins.SingleOrDefault(cn => cn.Denomination == coinDenom && cn.vendingMachine == GetThisVendingMachine());
-            if (coin != null) { coin.Count++; }
-            _context.SaveChanges();
+            if (coin != null)
+            {
+                if (coin.IsAvailable)
+                {
+                    coin.Count++;
+                    shopcart.ClientMoney += coinDenom;
+                    _context.SaveChanges();
+                }
+                else
+                {
+                    throw new Exception("Монета заблокирована");
+                }
+            }
+            else
+            {
+                throw new Exception("Такого номинала не существует");
+            }
 
             SetDataObjectToCache(sessionId, shopcart);
 
@@ -81,34 +92,32 @@ namespace WebApp.VendingMachine
             if (string.IsNullOrEmpty(sessionId) || shopcartId == Guid.Empty) { throw new AccessViolationException(); }
 
             var shopcart = GetDataObjectFromCache<ClientChopcartCache>(sessionId);
+            var drinkExampleFromDb = Drink.GetObjectDrinkAsync(itemId, _context).Result;
 
-            Func<int, object> UpCountDrink = delegate (int id)
+            Func<string, object> UpCountDrink = delegate (string title)
             {
-                shopcart.DrinksToClient.SingleOrDefault(dr => dr.ItemId == id).Count++;
+                shopcart.DrinksToClient.Where(dr => dr.Title == title).Select(dr => { dr.Count++; return dr; }).ToList();
                 return null;
             };
 
-            Func<int, object> AddDrinkToShopcart = delegate (int id)
+            Func<Drink, object> AddDrinkToShopcart = delegate (Drink drinkToClient)
             {
-                var drinkForClient = Drink.GetDrinkObjectAsync(itemId, _context).Result;
-                var drinkToClient = new Drink(drinkForClient.Title, drinkForClient.Price, 1);
-
-                shopcart.DrinksToClient.Add(drinkToClient);
+                shopcart.DrinksToClient.Add(new Drink(drinkToClient.Title, drinkToClient.Price, 1));
                 return null;
             };
 
             if (shopcart.DrinksToClient == null)
             {
                 shopcart.DrinksToClient = new List<Drink>();
-                AddDrinkToShopcart(itemId);
+                AddDrinkToShopcart(drinkExampleFromDb);
             }
-            else if (shopcart.DrinksToClient.Any(dr => dr.ItemId == itemId))
+            else if (shopcart.DrinksToClient.Any(dr => dr.Title == drinkExampleFromDb.Title))
             {
-                UpCountDrink(itemId);
+                UpCountDrink(drinkExampleFromDb.Title);
             }
             else
             {
-                AddDrinkToShopcart(itemId);
+                AddDrinkToShopcart(drinkExampleFromDb);
             }
 
             SetDataObjectToCache(sessionId, shopcart);
@@ -139,7 +148,7 @@ namespace WebApp.VendingMachine
 
             GetChangeToClient(shopcart.ClientMoney - shopcart.OrderSum, _context.Coins.Where(cn => cn.Count > 0 && cn.vendingMachine == GetThisVendingMachine()).ToList());
             RemoveCache(sessionId);
-            sessionId = CreateNewClientChopcartCache(shopcartId);
+            sessionId = CreateNewClientShopcartCache(shopcartId);
 
             return RedirectToIndex(sessionId, shopcartId);
         }
@@ -158,7 +167,7 @@ namespace WebApp.VendingMachine
         }
 
         public IActionResult ReturnBackVendingMashine() => RedirectToIndex(null, Guid.Empty);
-        
+
 
         #region Secondary_functions
 
@@ -174,12 +183,12 @@ namespace WebApp.VendingMachine
 
         private List<Coin> GetChangeToClient(decimal change, List<Coin> coinsInVM)
         {
+            change = Math.Round(change);
 
+            var coinsToClient = new List<Coin>();
 
-            var coinsToClient = new List<Coin>();               
-
-            if(coinsInVM.Count == 0) { throw new Exception("В автомате закончились деньги"); }
-            if(change > GetThisVendingMachine().Balance) { throw new Exception("В автомате нехватает средств"); }
+            if (coinsInVM.Count == 0) { throw new Exception("В автомате закончились деньги"); }
+            if (change > GetThisVendingMachine().Balance) { throw new Exception("В автомате нехватает средств"); }
 
             while (change > 0)
             {
@@ -187,9 +196,9 @@ namespace WebApp.VendingMachine
 
                 foreach (var coin in coinsInVM)
                 {
-                    if(change < coin.Denomination || coin.Count == 0) { continue; }
+                    if (change < coin.Denomination || coin.Count == 0) { continue; }
 
-                    if(coinsToClient.Any(cn => cn.ItemId == coin.ItemId))
+                    if (coinsToClient.Any(cn => cn.ItemId == coin.ItemId))
                     {
                         coinsToClient.SingleOrDefault(cn => cn.ItemId == coin.ItemId).Count++;
                     }
@@ -231,7 +240,7 @@ namespace WebApp.VendingMachine
             coinsInVM = coinsInVM.OrderByDescending(cn => Sort((cn.Denomination * cn.Count) - grafStartPoint)).ThenByDescending(cn => cn.Denomination).ToList();
         }
 
-        private string CreateNewClientChopcartCache(Guid shopcartId)
+        private string CreateNewClientShopcartCache(Guid shopcartId)
         {
             string sessionId = DateTime.Now.ToString().Replace(" ", "").Replace(":", "");
 

@@ -1,5 +1,5 @@
 ﻿@using WebApp.VendingMachine
-@model List<Coin>
+@model Tuple<List<Coin>, string, Guid>
 
 @{
     Layout = null;
@@ -22,10 +22,10 @@
 <body>
     <div style="margin-top:50px" class="container">
 
-        <h4>Монеты в автомате</h4>
+        <h3>Монеты в автомате</h3>
         <hr />
         <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-8">
                 @using (Html.BeginForm("ConfirmedEditCoins", "Admin", FormMethod.Post, new { enctype = "multipart/form-data" }))
                 {
                     <table class="table">
@@ -33,29 +33,29 @@
                         {
                             <tr>
                                 <td>
-                                    <h3>Номинал</h3>
+                                    <h4>Номинал</h4>
                                 </td>
                                 <td>
-                                    <h3>Количество</h3>
+                                    <h4>Количество</h4>
                                 </td>
                                 <td>
-                                    <h3>Прием</h3>
+                                    <h4>Прием</h4>
                                 </td>
                                 <td></td>
                             </tr>
-                            @for (int i = 0; i < Model.Count; i++)
+                            @for (int i = 0; i < Model.Item1.Count; i++)
                             {
                                 <tr>
                                     <td>
-                                        @Html.HiddenFor(m => m[i].ItemId, new { @class = "form-control" })
-                                        @Html.HiddenFor(m => m[i].Denomination, new { @class = "form-control" })
-                                        @Html.DisplayFor(m => m[i].Denomination)
+                                        @Html.HiddenFor(m => m.Item1[i].ItemId)
+                                        @Html.HiddenFor(m => m.Item1[i].Denomination)
+                                        @Html.DisplayFor(m => m.Item1[i].Denomination)
                                     </td>
                                     <td>
-                                        @Html.TextBoxFor(m => m[i].Count, new { @class = "form-control" })
+                                        @Html.TextBoxFor(m => m.Item1[i].Count)
                                     </td>
                                     <td>
-                                        @Html.CheckBoxFor(m => m[i].IsAvailable, new { @class = "form-control" })
+                                        @Html.CheckBoxFor(m => m.Item1[i].IsAvailable)
                                     </td>
                                 </tr>
                             }
@@ -74,7 +74,9 @@
         </div>
 
         <div>
-            <a asp-action="Index">Вернуться на главную</a>
+            <a href="@Url.Action("Index", "Admin", new {
+                                    User = Model.Item2,
+                                    AccessKey = Model.Item3 })">Вернуться на главную</a>
         </div>
     </div>
 </body>

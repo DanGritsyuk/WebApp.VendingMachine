@@ -61,7 +61,9 @@
                             </div>
                             <div class="col-md-4">
                                 <div style="margin-top:25px" class="form-group">                                    
-                                    <a asp-action="Index">Отмена</a>
+                                    <a href="@Url.Action("Index", "Admin", new {
+                                    User = AdminAccess.UserName,
+                                    AccessKey = AdminAccess.AccessKey })">Отмена</a>
                                 </div>
                             </div>
                         </td>
@@ -87,7 +89,9 @@
                                             </td>
                                             <td>
                                                 <div style="margin-top:25px" class="form-group">
-                                                    <a asp-action="Index">Отмена</a>
+                                                    <a href="@Url.Action("Index", "Admin", new {
+                                    User = AdminAccess.UserName,
+                                    AccessKey = AdminAccess.AccessKey })">Отмена</a>
                                                 </div>
                                             </td>
                                         </tr>

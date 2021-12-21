@@ -19,6 +19,17 @@ namespace WebApp.VendingMachine
             IsAvailable = isAvailable;
         }
 
+        public Drink(Drink drink)
+        {
+            ItemId = drink.ItemId;
+            Title = drink.Title;
+            ImageUrl = drink.ImageUrl;
+            Price = drink.Price;
+            Count = drink.Count;
+            IsAvailable = drink.IsAvailable;
+            VendingMachine = drink.VendingMachine;
+        }
+
         [Key]
         [Column(Order = 1)]
         [IgnoreDataMember]
@@ -68,8 +79,10 @@ namespace WebApp.VendingMachine
         /// <summary>
         /// навигационное свойство
         /// </summary>
-        public VendingMachineViewModel vendingMachine { get; set; }
+        public VendingMachineViewModel VendingMachine { get; set; }
 
-        public static async Task<Drink> GetDrinkObjectAsync(int id, VendingMachineContext context) => await context.Drinks.FirstOrDefaultAsync(dr => dr.ItemId == id);
+        public static Drink Empty = new Drink(string.Empty, 0, 0);
+
+        public static async Task<Drink> GetObjectDrinkAsync(int id, VMDataBaseContext context) => await context.Drinks.FirstOrDefaultAsync(dr => dr.ItemId == id);            
     }
 }

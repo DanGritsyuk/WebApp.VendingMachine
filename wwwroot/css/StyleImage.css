@@ -1,0 +1,17 @@
+﻿
+.exmpl {
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+    .exmpl img {
+        min-width: 100%;
+    }
+
+.drink-image {
+    width: 150px;
+    height: auto;
+}

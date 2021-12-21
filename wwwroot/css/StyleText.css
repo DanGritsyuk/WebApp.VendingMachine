@@ -19,11 +19,6 @@
     filter: grayscale(100%);
 }
 
-.drink-image {
-    width: 150px;
-    height: auto;
-}
-
 @font-face {
     font-family: "ubuntu";
     font-style: italic;

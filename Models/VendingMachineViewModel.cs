@@ -32,7 +32,7 @@ namespace WebApp.VendingMachine
             catch { return null; }
         }
 
-        public static VendingMachineViewModel GetDataFromBase(VendingMachineContext context, Guid thisMachineGuid)
+        public static VendingMachineViewModel GetDataFromBase(VMDataBaseContext context, Guid thisMachineGuid)
         {
             try
             {
@@ -40,7 +40,7 @@ namespace WebApp.VendingMachine
 
                 if (vendingMachineViewModel != null)
                 {
-                    vendingMachineViewModel.Drinks = context.Drinks.Where(dr => dr.vendingMachine == vendingMachineViewModel).ToList();
+                    vendingMachineViewModel.Drinks = context.Drinks.Where(dr => dr.VendingMachine == vendingMachineViewModel).ToList();
                     vendingMachineViewModel.Coins = context.Coins.Where(cn => cn.vendingMachine == vendingMachineViewModel).ToList();
                 }
                 return vendingMachineViewModel;
@@ -51,7 +51,7 @@ namespace WebApp.VendingMachine
             }
         }
 
-        public static bool VendingMachineViewModelExists(Guid id, VendingMachineContext context) =>
+        public static bool VendingMachineViewModelExists(Guid id, VMDataBaseContext context) =>
             context.VendingMachineViewModel.Any(e => e.ItemId == id);
     }
 }

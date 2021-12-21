@@ -1,4 +1,5 @@
-﻿@model WebApp.VendingMachine.Drink
+﻿@using WebApp.VendingMachine
+@model Drink
 
 @{
     Layout = null;
@@ -66,7 +67,9 @@
                 </div>
 
                 <div>
-                    <a asp-action="Index">Отмена</a>
+                    <a href="@Url.Action("Index", "Admin", new {
+                                    User = AdminAccess.UserName,
+                                    AccessKey = AdminAccess.AccessKey })">Отмена</a>
                 </div>
             </div>
         </div>

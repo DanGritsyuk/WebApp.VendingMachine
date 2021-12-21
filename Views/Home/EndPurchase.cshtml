@@ -37,6 +37,7 @@
                             <span class="letter">Х</span>
                             <span class="letter">О</span>
                             <span class="letter">Л</span>
+                            <span class="letter">О</span>
                             <span class="letter">Д</span>
                             <span class="letter">Н</span>
                             <span class="letter">Ы</span>
@@ -56,78 +57,98 @@
                 </div>
             </header>
         </a>
-        @if (Model.Item1 == null)
-        {
-            <h1>
-                Ничего не купили
-            </h1>
-        }
-        else
-        {
-            <div class="row">
-                <div class="drink-items col-xs-4 col-md-4 col-lg-12">
-                    <h3>Наименование</h3>
-                </div>
+        <div class="container">
+            @if (Model.Item1 == null)
+            {
 
+                <h1>
+                    Ничего не купили
+                </h1>
 
-                <div class="drink-items col-xs-4 col-md-4 col-lg-12">
-                    <h3>Цена</h3>
-                </div>
-                <div class="drink-items col-xs-4 col-md-4 col-lg-12">
-                    <h3>Количество</h3>
-                </div>
-            </div>
-            @foreach (var drink in Model.Item1)
+            }
+            else
             {
                 <div class="row">
-                    <div class="drink-items col-xs-4 col-md-4 col-lg-12">
-                        @Html.DisplayFor(modelItem => drink.Title)
+                    <div class="col-xs-2 col-md-2 col-lg-2"></div>
+                    <div id="receipt-area" class="col-xs-6 col-md-6 col-lg-10">
+                        <div class="row">
+                            <div class="coin-container col-lg-8">
+                                <div class="row">
+                                    <div class="drink-items col-xs-4 col-md-4 col-lg-12">
+                                        <h3>Наименование</h3>
+                                    </div>
+                                    <div class="drink-items col-xs-4 col-md-4 col-lg-12">
+                                        <h3>Цена</h3>
+                                    </div>
+                                    <div class="drink-items col-xs-4 col-md-4 col-lg-12">
+                                        <h3>Количество</h3>
+                                    </div>
+                                </div>
+                                @foreach (var drink in Model.Item1)
+                                {
+                                    <div class="row">
+                                        <div class="drink-items col-xs-4 col-md-4 col-lg-12">
+                                            @Html.DisplayFor(modelItem => drink.Title)
+                                        </div>
+                                        <div class="drink-items col-xs-4 col-md-4 col-lg-12">
+                                            @Html.DisplayFor(modelItem => drink.Price)
+                                        </div>
+                                        <div class="drink-items col-xs-4 col-md-4 col-lg-12">
+                                            @Html.DisplayFor(modelItem => drink.Count)
+                                        </div>
+                                    </div>
+                                }
+                                <br>
+                                <br>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-xs-1 col-md-1 col-lg-1"></div>
+                                    <div style="display: contents" class="col-xs-10 col-md-10 col-lg-10">
+                                        <h3>ИТОГО: @Model.Item1.Sum(dr => dr.Count * dr.Price)</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="drink-items col-xs-4 col-md-4 col-lg-12">
-                        @Html.DisplayFor(modelItem => drink.Price)
-                    </div>
-                    <div class="drink-items col-xs-4 col-md-4 col-lg-12">
-                        @Html.DisplayFor(modelItem => drink.Count)
-                    </div>
-                </div>
-            }
-            <div class="row">
-                <h3>ИТОГО: @Model.Item1.Sum(dr => dr.Count * dr.Price)</h3>
-            </div>
-            <div class="row">
-                <div id="main-content" class="col-xs-12 col-md-12 col-lg-12">
-                    @if (Model.Item2.Count > 0)
-                    {
-                        <h1>ВАША СДАЧА</h1>
-                    }
-                    else
-                    {
-                        <h1>ПОД РАСЧЕТ</h1>
-                    }
+                    <div id="chande-panel" class="col-xs-4 col-md-4 col-lg-4">
+                        <div class="row">
+                            @if (Model.Item2.Count > 0)
+                            {
+                                <div id="main-content" class="col-xs-12 col-md-12 col-lg-12">
+                                    <h1>ВАША СДАЧА</h1>
+                                </div>
+                                <div style="margin-left: auto; margin-right: auto;" class="col-xs-6 col-md-6 col-lg-6">
+                                    @foreach (var coin in Model.Item2)
+                                    {
+                                        for (int i = 0; i < coin.Count; i++)
+                                        {
+                                            @if (coin.Denomination == 10)
+                                            {
+                                                <div style="transition: none;" class="coin gold"><p>@coin.Denomination</p></div>
+                                            }
+                                            else if (coin.Denomination == 1)
+                                            {
+                                                <div style="transition: none;" class="coin bronze"><p>@coin.Denomination</p></div>
+                                            }
+                                            else
+                                            {
+                                                <div style="transition: none;" class="coin silver"><p>@coin.Denomination</p></div>
+                                            }
+                                        }
 
-                </div>
-                <div id="main-content" class="drink-image col-xs-2 col-md-3 col-lg-6">
-                    @foreach (var coin in Model.Item2)
-                    {
-                        for (int i = 0; i < coin.Count; i++)
-                        {
-                            @if (coin.Denomination == 10)
-                            {
-                                <div class="coin gold"><p>@coin.Denomination</p></div>
-                            }
-                            else if (coin.Denomination == 1)
-                            {
-                                <div class="coin bronze"><p>@coin.Denomination</p></div>
+                                    }
+                                </div>
                             }
                             else
                             {
-                                <div class="coin silver"><p>@coin.Denomination</p></div>
+                                <div id="main-content" class="col-xs-12 col-md-12 col-lg-12">
+                                    <h1>ПОД РАСЧЕТ</h1>
+                                </div>
                             }
-                        }
-
-                    }
+                        </div>
+                    </div>
                 </div>
-            </div>
-        }
+            }
+        </div>
     </body>
 </html>

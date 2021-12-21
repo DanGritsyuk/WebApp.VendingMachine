@@ -8,7 +8,7 @@ using WebApp.VendingMachine;
 
 namespace WebApp.VendingMachine.Migrations
 {
-    [DbContext(typeof(VendingMachineContext))]
+    [DbContext(typeof(VMDataBaseContext))]
     partial class VendingMachineContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

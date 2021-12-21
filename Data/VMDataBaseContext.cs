@@ -2,9 +2,9 @@
 
 namespace WebApp.VendingMachine
 {
-    public class VendingMachineContext : DbContext
+    public class VMDataBaseContext : DbContext
     {
-        public VendingMachineContext(DbContextOptions<VendingMachineContext> options) : base(options) { }
+        public VMDataBaseContext(DbContextOptions<VMDataBaseContext> options) : base(options) { }
 
         public DbSet<Coin> Coins { get; set; }
         public DbSet<Drink> Drinks { get; set; }

@@ -16,6 +16,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Remove="App_Data\Config\AdminAccessKey.config" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Include="Migrations\20211021202449_Initial.cs" />
     <Compile Include="Migrations\20211021202449_Initial.Designer.cs" />
     <Compile Include="Migrations\VendingMachineContextModelSnapshot.cs" />
@@ -34,6 +38,10 @@
   <ItemGroup>
     <Folder Include="App_Data\Temp\" />
     <Folder Include="wwwroot\images\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="App_Data\Config\AdminAccessKey.config" />
   </ItemGroup>
 
 </Project>

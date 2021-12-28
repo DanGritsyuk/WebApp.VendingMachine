@@ -236,7 +236,7 @@ namespace WebApp.VendingMachine
 
         #region ExportImportDrink
 
-        public IActionResult ExportList() => View("ExportImportDrinks/Export", new Tuple<List<Drink>, string, Guid>( _context.Drinks.ToList(), _user, _accessKey ));
+        public IActionResult ExportList() => View("ExportImportDrinks/Export", _context.Drinks.ToList());
         public IActionResult ImportList() => View("ExportImportDrinks/Import");
 
         public IActionResult ToExport(int[] ItemIds) =>

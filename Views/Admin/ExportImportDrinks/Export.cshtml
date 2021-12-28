@@ -1,5 +1,5 @@
 ﻿@using WebApp.VendingMachine
-@model Tuple<List<Drink>, string, Guid>
+@model List<Drink>
 
 @{
     Layout = null;
@@ -79,8 +79,8 @@
                                                         <td>
                                                             <div>
                                                                 <a href="@Url.Action("Index", "Admin", new {
-                                    User = Model.Item2,
-                                    AccessKey = Model.Item3 })">Отмена</a>
+                                    User = AdminAccess.UserName,
+                                    AccessKey = AdminAccess.AccessKey })">Отмена</a>
                                                             </div>
                                                         </td>
                                                     </tr>
@@ -100,7 +100,7 @@
                                                             <input type="checkbox" name="checkall" id="checkall" onClick="check_uncheck_checkbox(this.checked);" />
                                                         </td>
                                                     </tr>
-                                                    @foreach (var viewModel in Model.Item1)
+                                                    @foreach (var viewModel in Model)
                                                     {
                                                         <tr>
                                                             <td>

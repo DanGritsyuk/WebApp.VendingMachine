@@ -20,7 +20,7 @@ namespace WebApp.VendingMachine
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>().UseUrls("http://192.168.1.216:80");
+                    webBuilder.UseStartup<Startup>().UseUrls("http://localhost:80");
                 });
     }
 }

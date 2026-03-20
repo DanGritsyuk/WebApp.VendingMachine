@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="StackExchange.Redis" Version="2.12.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\VendingMachine.Common.Entities\VendingMachine.Common.Entities.csproj" />
+    <ProjectReference Include="..\VendingMachine.DAL.Cache.Contracts\VendingMachine.DAL.Cache.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>

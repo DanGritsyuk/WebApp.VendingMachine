@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>77c330f8-84b9-42a1-bbfc-a5bad0196b51</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.1.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="8.0.21" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.21">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\VendingMachine.BLL.Logic\VendingMachine.BLL.Logic.csproj" />
+    <ProjectReference Include="..\VendingMachine.DAL.Cache.Redis\VendingMachine.DAL.Cache.Redis.csproj" />
+    <ProjectReference Include="..\VendingMachine.DAL.Repositories\VendingMachine.DAL.Repositories.csproj" />
+    <ProjectReference Include="..\VendingMachine.DAL.Storage\VendingMachine.DAL.Storage.csproj" />
+  </ItemGroup>
+
+</Project>
